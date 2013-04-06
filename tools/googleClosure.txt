@@ -1,0 +1,4 @@
+// à ajuster : compression du js par google compilation
+// TODO : externals pour les libs
+// TODO : export pour les methodes accessible
+java -jar "$(ToolsDir)\google\compiler.jar" --js "$(OutputDir)\$(OutputName)" --compilation_level ADVANCED_OPTIMIZATIONS --externs "$(OutputDir)\lib\easeljs-0.6.0.min.js" --externs "$(OutputDir)\lib\jquery-1.9.1.min.js" --externs "$(OutputDir)\lib\preloadjs-0.3.0.min.js" --externs "$(OutputDir)\lib\soundjs-0.4.0.min.js" --externs "$(OutputDir)\lib\tweenjs-0.4.0.min.js" --js_output_file "$(OutputDir)\$(ProjectName)_gc.js"
