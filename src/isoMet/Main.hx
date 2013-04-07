@@ -221,43 +221,43 @@ class Main
 		g.addTile(new TileContentModel(function()
 			{
 				return  GfxFactory.displayObjectfromLib("Bush");
-			} ), 10, 10, 0);
-		g.getTileAt(10, 10, 0).setTraversable(false);
+			} ), 10, 25, 0);
+		g.getTileAt(10, 25, 0).setTraversable(false);
 		g.addTile(new TileContentModel(function()
 			{
 				return  GfxFactory.displayObjectfromLib("StoreSmall");
-			}), 10, 11, 0);
-		g.getTileAt(10, 11, 0).setTraversable(false);
+			}), 10, 26, 0);
+		g.getTileAt(10, 26, 0).setTraversable(false);
 		
 		g.addTile(new TileContentModel(function()
 			{
 				return  GfxFactory.displayObjectfromLib("TreeCone");
-			}), 10, 12, 0);
-		g.getTileAt(10, 12, 0).setTraversable(false);
+			}), 10, 27, 0);
+		g.getTileAt(10, 27, 0).setTraversable(false);
 		g.addTile(new TileContentModel(function()
 			{
 				return  GfxFactory.displayObjectfromLib("TreeApple");
-			}), 10, 13, 0);
-		g.getTileAt(10, 13, 0).setTraversable(false);
+			}), 10, 28, 0);
+		g.getTileAt(10, 28, 0).setTraversable(false);
 		
 		
 		g.addTile(new TileContentModel(function()
 			{
 				return  GfxFactory.displayObjectfromLib("TreeApple1");
-			}), 11, 10, 0);
-		g.getTileAt(11, 10, 0).setTraversable(false);
+			}), 11, 25, 0);
+		g.getTileAt(11, 25, 0).setTraversable(false);
 		g.addTile(new TileContentModel(function()
 			{
 				return  GfxFactory.displayObjectfromLib("TreeApple2");
-			}), 12, 10, 0);
-		g.getTileAt(12, 10, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRound")), 13, 14, 0);
-		g.getTileAt(13, 14, 0).setTraversable(false);
+			}), 12, 25, 0);
+		g.getTileAt(12, 25, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRound")), 13, 28, 0);
+		g.getTileAt(13, 28, 0).setTraversable(false);
 		g.addTile(new TileContentModel(function()
 			{
 				return  GfxFactory.displayObjectfromLib("TreeRoundFlower");
-			}), 14, 10, 0);
-		g.getTileAt(14, 10, 0).setTraversable(false);
+			}), 14, 25, 0);
+		g.getTileAt(14, 25, 0).setTraversable(false);
 		
 		g.addTile(userTile = new TileContentModel(function() {
 				return  GfxFactory.mur(255,0,0);
@@ -275,6 +275,7 @@ class Main
 		trace("evt_MapClick " + e.initialData);
 		
 		var p = getGridPos(e.initialData);
+	
 		trace("p :" + p ) ;
 		if (!g.isInside(p.x, p.y)) return;
 		if (!g.getTileAt(p.x, p.y).isTraversable()) return;
