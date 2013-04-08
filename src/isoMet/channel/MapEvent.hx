@@ -14,6 +14,7 @@ class MapEvent extends DataBringerEvent<Point>
 	
 	
 	static public var EVT_CLICK:String = 'evt_click';
+	static public var EVT_CTRLCLICK:String = 'evt_CTRLclick';
 	
 	
 	

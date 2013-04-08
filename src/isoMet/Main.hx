@@ -5,16 +5,15 @@ import createjs.easeljs.Container;
 import createjs.easeljs.DisplayObject;
 import createjs.easeljs.Point;
 import createjs.easeljs.Stage;
-import createjs.easeljs.Text;
 import createjs.easeljs.Ticker;
 import createjs.preloadjs.LoadQueue;
 import createjs.tweenjs.Tween;
 import events.Mouse;
 import events.PreloadJS;
 import events.Window;
+import haxe.Json;
 import haxe.Timer;
 import isoMet.channel.MapEvent;
-import isoMet.channel.TileEvent;
 import isoMet.controler.Astar_2;
 import isoMet.models.GridItems;
 import isoMet.models.GridModel;
@@ -24,7 +23,7 @@ import isoMet.view.GfxFactory;
 import js.Browser;
 import js.html.Element;
 import js.html.Event;
-import js.html.svg.AnimatedBoolean;
+import js.html.MouseEvent;
 import js.JQuery;
 
 
@@ -131,12 +130,15 @@ class Main
 	}
 	
 	private function evt_clickMap(e:Event) {
+		var me:MouseEvent = cast(e, MouseEvent);
+		
 		var p = gview.globalToLocal(_stage.mouseX, _stage.mouseY);
-		trace(_stage.x + " " + _stage.y + " " + p.x + " " + p.y+" ");
-		MapEvent.sdispatch( 
-			MapEvent.EVT_CLICK,p
-			
-			);
+		trace(_stage.x + " " + _stage.y + " " + p.x + " " + p.y + " " + me.ctrlKey);
+		if (me.ctrlKey) {
+			MapEvent.sdispatch( MapEvent.EVT_CTRLCLICK,p);
+		} else {
+			MapEvent.sdispatch( MapEvent.EVT_CLICK,p);
+		}
 	}
 	//In CreateJS we have to update stage every time any display object changed.
     //So it's not necessary to update it on each frame but in this example choose the simple way.
@@ -185,8 +187,9 @@ class Main
 		
 		g = new GridModel(50, 50);
 		g.setBackGround("img/backgrounds/iso-2.jpg", 0, 0);
+		g.setMap("map/map_1.json");
 		
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("HouseWhite",2)), 25, 25, 0);
+		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("House_White",1)), 25, 25, 0);
 		g.getTileAt(25, 25, 0).setTraversable(false);
 		g.getTileAt(26, 25, 0).setTraversable(false);
 		g.getTileAt(25, 26, 0).setTraversable(false);
@@ -218,60 +221,37 @@ class Main
 		//g.getTileAt(8, 8, 0).setTraversable(false);
 		
 		
-		g.addTile(new TileContentModel(function()
-			{
-				return  GfxFactory.displayObjectfromLib("Bush");
-			} ), 10, 25, 0);
-		g.getTileAt(10, 25, 0).setTraversable(false);
-		g.addTile(new TileContentModel(function()
-			{
-				return  GfxFactory.displayObjectfromLib("StoreSmall");
-			}), 10, 26, 0);
-		g.getTileAt(10, 26, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("Bush")), 23, 15, 0);
+		g.getTileAt(23, 15, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("Store_Medium")), 23, 16, 0);
+		g.getTileAt(23, 16, 0).setTraversable(false);
 		
-		g.addTile(new TileContentModel(function()
-			{
-				return  GfxFactory.displayObjectfromLib("TreeCone");
-			}), 10, 27, 0);
-		g.getTileAt(10, 27, 0).setTraversable(false);
-		g.addTile(new TileContentModel(function()
-			{
-				return  GfxFactory.displayObjectfromLib("TreeApple");
-			}), 10, 28, 0);
-		g.getTileAt(10, 28, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeCone")), 23, 17, 0);
+		g.getTileAt(23, 17, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeApple")), 23, 18, 0);
+		g.getTileAt(23, 18, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("House1")), 24, 15, 0);
+		g.getTileAt(24, 15, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("Windmill")), 25, 15, 0);
+		g.getTileAt(25, 15, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRound")), 26, 18, 0);
+		g.getTileAt( 26, 18, 0).setTraversable(false);
+		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRoundFlower")), 27, 15, 0);
+		g.getTileAt(27, 15, 0).setTraversable(false);
 		
-		
-		g.addTile(new TileContentModel(function()
-			{
-				return  GfxFactory.displayObjectfromLib("TreeApple1");
-			}), 11, 25, 0);
-		g.getTileAt(11, 25, 0).setTraversable(false);
-		g.addTile(new TileContentModel(function()
-			{
-				return  GfxFactory.displayObjectfromLib("TreeApple2");
-			}), 12, 25, 0);
-		g.getTileAt(12, 25, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRound")), 13, 28, 0);
-		g.getTileAt(13, 28, 0).setTraversable(false);
-		g.addTile(new TileContentModel(function()
-			{
-				return  GfxFactory.displayObjectfromLib("TreeRoundFlower");
-			}), 14, 25, 0);
-		g.getTileAt(14, 25, 0).setTraversable(false);
-		
-		g.addTile(userTile = new TileContentModel(function() {
-				return  GfxFactory.mur(255,0,0);
-			}), userPos_x, userPos_y, 0);
+		g.addTile(userTile = new TileContentModel(GfxFactory.mur.bind(255,0,0)), userPos_x, userPos_y, 0);
 		userTile.x = 0;
 		path =  new Array<TileContentModel>();
 		
-		TileEvent.getChannel().addEventListener(TileEvent.EVT_CLICK, evt_tileClick);
+		//TileEvent.getChannel().addEventListener(TileEvent.EVT_CLICK, evt_tileClick);
 		MapEvent.getChannel().addEventListener(MapEvent.EVT_CLICK, evt_MapClick);
+		MapEvent.getChannel().addEventListener(MapEvent.EVT_CTRLCLICK, evt_MapCtrlClick);
 		
 	}
 	private var path:Array<TileContentModel>;
 	private function evt_MapClick(e:MapEvent):Void 
 	{
+		
 		trace("evt_MapClick " + e.initialData);
 		
 		var p = getGridPos(e.initialData);
@@ -281,26 +261,19 @@ class Main
 		if (!g.getTileAt(p.x, p.y).isTraversable()) return;
 		helperMoveTo(p.x, p.y);
 	}
-	
-	
-	private function evt_tileClick(e:TileEvent):Void 
+	private function evt_MapCtrlClick(e:MapEvent):Void 
 	{
-		trace("evt_mouseDown Main TileContentModel" +e.type + e.initialData.x + e.initialData.y);
-		// STOP end CLEAR precedent mouvement
-		if (!e.initialData.isTraversable()) return;
-		
-		helperMoveTo(e.initialData.x, e.initialData.y);
-		
-				//--> determiner le sens du deplacement
-		//if (sd==0 /*horizontal*/ || sd>1 ||sd <-1 /* vertical*/) {
-		//
-		//} else if (sd==1) {
-		//
-		//}else if (sd==-1) {
-			//
-		//}
-		
+		var p = getGridPos(e.initialData);
+	
+		trace("p :" + p ) ;
+		if (!g.isInside(p.x, p.y)) return;
+		g.getTileAt(p.x, p.y).setTraversable(!g.getTileAt(p.x, p.y).isTraversable()); 
+		invalideView = true;
+		serialize();
 	}
+	
+	
+	
 	
 	private function helperMoveTo(x:Int,y:Int) {
 		trace("helperMoveTo" +x+" "+y);
@@ -346,6 +319,15 @@ class Main
 	 * @param	y
 	 */
 	private function move_step(x:Int, y:Int) {
+				//--> determiner le sens du deplacement
+		//if (sd==0 /*horizontal*/ || sd>1 ||sd <-1 /* vertical*/) {
+		//
+		//} else if (sd==1) {
+		//
+		//}else if (sd==-1) {
+			//
+		//}
+		
 		var alphMoveSpeed = 10;
 		var from_x = userPos_x;		
 		var from_y = userPos_y;	
@@ -430,8 +412,9 @@ class Main
 			
 			gview.addChild(g.backGround);
 			var sc = Math.max(width / g.backGround.image.width, height / g.backGround.image.height);
-			//gview.scaleX = gview.scaleY = width / g.backGround.image.width;
-			//gview.x =- g.backGround.x*gview.scaleX;
+			gview.scaleX = gview.scaleY = width / g.backGround.image.width;
+			gview.x = - g.backGround.x * gview.scaleX;
+			gview.y = - g.backGround.y * gview.scaleY;
 			//gview.x = -(width-g.backGround.image.width)/2;
 		}
 		
@@ -443,6 +426,20 @@ class Main
 		_stage.addChild(gview);
 		
 		
+	}
+	
+	private function serialize() {
+		var r:Array<Array<Int>>;
+		r = new Array<Array<Int>>();
+		for (x in 0...g.xSize) {
+				r[x] = new Array<Int>();
+				for (y in 0...g.ySize) {
+					r[x][y] = g.getTileAt(x, y).isTraversable()?1:0;		
+				}
+				
+		}
+		 var js=Json.stringify(r);
+		trace(js);
 	}
 	private function paintCount() {
 		if (gview == null) {
@@ -514,7 +511,9 @@ class Main
 		
 	//	if (p.x>-g.tilesWidth && p.x<width+g.tilesWidth && p.y>-g.tilesHeight && p.y<height+g.tilesHeight) {
 			gview.addChild(itView);
+			#if debug
 					items.setDebugText(Std.string(idDebug) + " " + Std.string(x) + "," + Std.string(y));
+			#end
 					/*
 					gview.addChild(
 							new Text(Std.string(idDebug) + " " + Std.string(x) + "," + Std.string(y))

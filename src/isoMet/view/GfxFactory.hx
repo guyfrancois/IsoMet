@@ -3,9 +3,11 @@ import createjs.easeljs.BitmapAnimation;
 import createjs.easeljs.Container;
 import createjs.easeljs.DisplayObject;
 import createjs.easeljs.Graphics;
+import createjs.easeljs.Shadow;
 import createjs.easeljs.Shape;
 import createjs.easeljs.SpriteSheet;
 import createjs.easeljs.SpriteSheetBuilder;
+import createjs.easeljs.MovieClip;
 import isoMet.models.GridModel;
 
 /**
@@ -48,6 +50,7 @@ class GfxFactory
 		return bmpAnim;
 		
 	}
+	
 	private static function animFromLib_complete(e:Dynamic, targetDisplay:Container) {
 		
 		var spriteSheet:SpriteSheet = e.target.spriteSheet;
@@ -75,6 +78,8 @@ class GfxFactory
 		
 	}
 	
+	
+	
 	public static function displayObjectfromLib(id:String,scale:Float=1):DisplayObject {
 		//var S:Class<Dynamic> = Type.resolveClass("lib." + id); // valable que pour des class registered
 		
@@ -88,6 +93,25 @@ class GfxFactory
 		ret.scaleX = ret.scaleY = scale;
 		ret.cache( -64, -200, 128, 264, scale);
 		ret.mouseEnabled = false;
+		return ret;
+		
+	}
+	
+	public static function spritefromLib(id:String,scale:Float=1):DisplayObject {
+		//var S:Class<Dynamic> = Type.resolveClass("lib." + id); // valable que pour des class registered
+		
+		// TODO : trouver un moyen safe d'acceder au element de library
+		
+		var S:Class<BitmapAnimation> = untyped __js__("spriteLib[id]");
+		if (S == null) {
+			return mur(255, 0, 0);
+		}
+		var ret:BitmapAnimation = Type.createInstance(S, []);
+		ret.scaleX = ret.scaleY = scale;
+		
+	//	ret.cache( -64, -200, 128, 264, scale);
+		ret.mouseEnabled = false;
+		//ret.shadow=new Shadow("#000000",10,10,1);
 		return ret;
 		
 	}

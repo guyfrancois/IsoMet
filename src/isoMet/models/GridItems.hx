@@ -107,6 +107,7 @@ class GridItems extends TileContentModel
 		} else {
 			sol = null;
 		}
+		invalideView = true;
 		#end
 		
 	}

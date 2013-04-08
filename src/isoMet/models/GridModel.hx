@@ -2,6 +2,7 @@ package isoMet.models;
 import createjs.easeljs.Bitmap;
 import createjs.easeljs.Point;
 import events.PreloadJS;
+import haxe.Json;
 import js.html.ImageElement;
 
 
@@ -23,6 +24,8 @@ class GridModel
 	public var ySize:Int;
 	
 	public var src_backGround : String = "img/backgrounds/iso-4.jpg";
+	public var src_map : String = "map/map_1.json";
+	
 	public var xBackOffset :Int;
 	public var yBackOffset :Int;
 	public var backGround : Bitmap;
@@ -41,6 +44,18 @@ class GridModel
 			}
     	}
 		
+	}
+	
+	public function setMap(src_map:String) {
+		this.src_map = src_map;
+		var map = Main.loadQueue.getItem(src_map);
+		if (map == null ) {
+			Main.loadQueue.addEventListener(PreloadJS.COMPLETE, evt_mapLoad);
+			
+			Main.loadQueue.loadFile(src_map);
+		} else {
+			evt_mapLoad(null);
+		}
 	}
 	
 	
@@ -62,6 +77,18 @@ class GridModel
 		trace("file loaded" + src_backGround);
 		var item = Main.loadQueue.getItem(src_backGround);
 		backGround = new Bitmap(src_backGround);
+	
+	}
+	private function evt_mapLoad(e) {
+		trace("file loaded" + src_map);
+		var item = Main.loadQueue.getResult(src_map);
+		if (item == null) return;
+		
+		for (x in 0...xSize) {
+			for (y in 0...ySize) {
+				items[x][y].setTraversable(item[x][y] == 1);
+			}
+    	}
 	
 	}
 	
