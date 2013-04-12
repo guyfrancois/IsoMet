@@ -18,6 +18,7 @@ import isoMet.controler.Astar_2;
 import isoMet.models.GridItems;
 import isoMet.models.GridModel;
 import isoMet.models.Int2d;
+import isoMet.models.PersoTile;
 import isoMet.models.TileContentModel;
 import isoMet.view.GfxFactory;
 import js.Browser;
@@ -179,7 +180,7 @@ class Main
 	
 	private var userPos_x:Int=15;
 	private var userPos_y:Int=15;
-	private var userTile:TileContentModel;
+	private var userTile:PersoTile;
 	
 	private var anim:BitmapAnimation;
 	
@@ -239,7 +240,7 @@ class Main
 		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRoundFlower")), 27, 15, 0);
 		g.getTileAt(27, 15, 0).setTraversable(false);
 		
-		g.addTile(userTile = new TileContentModel(GfxFactory.mur.bind(255,0,0)), userPos_x, userPos_y, 0);
+		g.addTile(userTile = new PersoTile(GfxFactory.autoAnimfromLib.bind("perso_test")), userPos_x, userPos_y, 0);
 		userTile.x = 0;
 		path =  new Array<TileContentModel>();
 		
@@ -350,6 +351,8 @@ class Main
 		
 		trace("speed" + speed);	
 		invalideView = true;
+		
+		helper_direction_move(userTile, dx, dy) ;
 		(mvTween=Tween.get(view,null,null,true)).to({ x:ddx, y:ddy }, speed).call(
 			function() {
 				
@@ -375,12 +378,43 @@ class Main
 						} else {
 							mvTween = null;
 							invalideView = true;
+							userTile.cmd(ANIM.IDLE);
 						}
 					}
 				);
 				
 			}
 		);
+	}
+	
+	private function helper_direction_move(pj:PersoTile,dx:Int , dy:Int) {
+		
+		if (dx > 0) { // gauche
+			if (dy > 0) {
+				userTile.cmd(ANIM.W_B);
+			} else if (dy < 0) {
+				userTile.cmd(ANIM.W_G);
+			} else {
+				userTile.cmd(ANIM.W_BG);
+			}
+		} else if (dx < 0) {
+			if (dy > 0) {
+				userTile.cmd(ANIM.W_D);
+			} else if (dy < 0) {
+				userTile.cmd(ANIM.W_H);
+			} else {
+				userTile.cmd(ANIM.W_HD);
+			}
+		} else  {
+			if (dy > 0) {
+				userTile.cmd(ANIM.W_BD);
+			} else if (dy < 0) {
+				userTile.cmd(ANIM.W_HG);
+			} else {
+				userTile.cmd(ANIM.IDLE);
+			}
+		}
+		
 	}
 	
 	private function helper_direction(dx:Int , dy:Int):Int {
