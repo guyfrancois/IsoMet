@@ -22,6 +22,7 @@ enum ANIM {
 	   W_HD;
 	   W_B;
 	   W_H;
+	   ROCK;
 }
 	
 class PersoTile extends TileContentModel
@@ -84,7 +85,8 @@ class PersoTile extends TileContentModel
 				case W_H : 
 					anim.scaleX=1;
 					anim.gotoAndPlay("W_H");
-				//default : anim.gotoAndPlay("W_D");
+				default : 
+					anim.gotoAndPlay("ROCK");
 					
 					
 		}

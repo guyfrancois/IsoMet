@@ -8,6 +8,7 @@ import createjs.easeljs.Stage;
 import createjs.easeljs.Ticker;
 import createjs.preloadjs.LoadQueue;
 import createjs.tweenjs.Tween;
+import events.Key;
 import events.Mouse;
 import events.PreloadJS;
 import events.Window;
@@ -93,6 +94,8 @@ class Main
 		
 		container.addEventListener(Mouse.CLICK, _main.evt_clickMap);
 		
+		Browser.document.addEventListener(Key.KEYDOWN, _main.evt_key);
+		
 		Browser.window.addEventListener(Window.RESIZE, evt_resize);
 		evt_resize(null);
 		  Ticker.addListener(_main.tickHandler);
@@ -129,7 +132,13 @@ class Main
 		}
 		
 	}
-	
+	private function evt_key(e:Dynamic) {
+		trace("evt_key" + e.keyCode );
+		switch (e.keyCode) {
+			case  32: userTile.cmd(ANIM.ROCK);
+			default : null ;
+		}
+	}
 	private function evt_clickMap(e:Event) {
 		var me:MouseEvent = cast(e, MouseEvent);
 		

@@ -147,6 +147,8 @@ Type.enumIndex = function(e) {
 	return e[1];
 }
 var events = {}
+events.Key = function() { }
+events.Key.__name__ = true;
 events.Mouse = function() { }
 events.Mouse.__name__ = true;
 events.PreloadJS = function() { }
@@ -490,6 +492,7 @@ isoMet.Main.main = function() {
 	console.log("width : " + isoMet.Main.width + "| height : " + isoMet.Main.height);
 	isoMet.Main._main = new isoMet.Main();
 	isoMet.Main.container.addEventListener("click",($_=isoMet.Main._main,$bind($_,$_.evt_clickMap)));
+	js.Browser.document.addEventListener("keydown",($_=isoMet.Main._main,$bind($_,$_.evt_key)));
 	js.Browser.window.addEventListener("resize",isoMet.Main.evt_resize);
 	isoMet.Main.evt_resize(null);
 	createjs.Ticker.addListener(($_=isoMet.Main._main,$bind($_,$_.tickHandler)));
@@ -722,6 +725,16 @@ isoMet.Main.prototype = {
 		var p = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
 		console.log(isoMet.Main._stage.x + " " + isoMet.Main._stage.y + " " + p.x + " " + p.y + " " + Std.string(me.ctrlKey));
 		if(me.ctrlKey) isoMet.channel.MapEvent.sdispatch(isoMet.channel.MapEvent.EVT_CTRLCLICK,p); else isoMet.channel.MapEvent.sdispatch(isoMet.channel.MapEvent.EVT_CLICK,p);
+	}
+	,evt_key: function(e) {
+		console.log("evt_key" + Std.string(e.keyCode));
+		switch(e.keyCode) {
+		case 32:
+			this.userTile.cmd(isoMet.models.ANIM.ROCK);
+			break;
+		default:
+			null;
+		}
 	}
 	,__class__: isoMet.Main
 }
@@ -1126,7 +1139,7 @@ isoMet.models.Int2d.prototype = {
 	}
 	,__class__: isoMet.models.Int2d
 }
-isoMet.models.ANIM = { __ename__ : true, __constructs__ : ["IDLE","W_D","W_G","W_BD","W_BG","W_HG","W_HD","W_B","W_H"] }
+isoMet.models.ANIM = { __ename__ : true, __constructs__ : ["IDLE","W_D","W_G","W_BD","W_BG","W_HG","W_HD","W_B","W_H","ROCK"] }
 isoMet.models.ANIM.IDLE = ["IDLE",0];
 isoMet.models.ANIM.IDLE.toString = $estr;
 isoMet.models.ANIM.IDLE.__enum__ = isoMet.models.ANIM;
@@ -1154,6 +1167,9 @@ isoMet.models.ANIM.W_B.__enum__ = isoMet.models.ANIM;
 isoMet.models.ANIM.W_H = ["W_H",8];
 isoMet.models.ANIM.W_H.toString = $estr;
 isoMet.models.ANIM.W_H.__enum__ = isoMet.models.ANIM;
+isoMet.models.ANIM.ROCK = ["ROCK",9];
+isoMet.models.ANIM.ROCK.toString = $estr;
+isoMet.models.ANIM.ROCK.__enum__ = isoMet.models.ANIM;
 isoMet.models.PersoTile = function(viewBuilder) {
 	isoMet.models.TileContentModel.call(this,viewBuilder);
 	this.lastCmd = isoMet.models.ANIM.IDLE;
@@ -1203,6 +1219,8 @@ isoMet.models.PersoTile.prototype = $extend(isoMet.models.TileContentModel.proto
 			anim.scaleX = 1;
 			anim.gotoAndPlay("W_H");
 			break;
+		default:
+			anim.gotoAndPlay("ROCK");
 		}
 	}
 	,getView: function() {
