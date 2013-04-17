@@ -12,6 +12,7 @@ import events.Key;
 import events.Mouse;
 import events.PreloadJS;
 import events.Window;
+import gf.GTools;
 import haxe.Json;
 import haxe.Timer;
 import isoMet.channel.MapEvent;
@@ -26,6 +27,7 @@ import js.Browser;
 import js.html.Element;
 import js.html.Event;
 import js.html.MouseEvent;
+import js.html.svg.AnimatedBoolean;
 import js.JQuery;
 
 
@@ -55,7 +57,7 @@ class Main
         //Here we tells it to use browser "requestAnimationFrame" instead of "setTimeout" to process ticks
         Ticker.useRAF = false;
         //Maximum FPS
-        Ticker.setFPS(60);
+        Ticker.setFPS(30);
 	
     	
 		 //Creating of stage. We need to create stage manually. Constructor receives canvas element declared in index.html.
@@ -135,7 +137,15 @@ class Main
 	private function evt_key(e:Dynamic) {
 		trace("evt_key" + e.keyCode );
 		switch (e.keyCode) {
-			case  32: userTile.cmd(ANIM.ROCK);
+			case  32:
+				userTile.cmd(ANIM.ROCK);
+				_main.serialize();
+			case  107://+
+					var p = gview.globalToLocal(_stage.mouseX, _stage.mouseY);
+					MapEvent.sdispatch( MapEvent.EVT_ELEVEPLUS,p);
+			case  109://-
+					var p = gview.globalToLocal(_stage.mouseX, _stage.mouseY);
+					MapEvent.sdispatch( MapEvent.EVT_ELEVEMOINS,p);
 			default : null ;
 		}
 	}
@@ -152,21 +162,43 @@ class Main
 	}
 	//In CreateJS we have to update stage every time any display object changed.
     //So it's not necessary to update it on each frame but in this example choose the simple way.
+	var pointMouse:Point;
+	
     private function tickHandler():Void
     {
+		var newp = gview.globalToLocal(_stage.mouseX, _stage.mouseY);
 		
-		
+		if (pointMouse == null || GTools.fdistance_manhattan(newp.x, newp.y, pointMouse.x, pointMouse.y)>2) {
+			pointMouse = newp;
+			invalideView = true;
+		}
       
 		var fps = js.Browser.document.getElementById('fps');
 		//#if debug
 		
 		fps.innerHTML = Std.string("FPS :"+Std.int(Ticker.getMeasuredFPS()*10)/10);
 		//#end
-		if (mvTween!= null || invalideView ) {
+		if (mvTween != null || invalideView ) {
+			if (currentMouseTarget != null) {
+				currentMouseTarget.update();
+			}
+			currentMouseTarget = null;
 			paintCount();
+			if (mouseIndic == null) {
+				mouseIndic = GfxFactory.circle(255, 255, 0);
+			}
+			if (currentMouseTarget != null) {
+			
+				currentMouseTarget.setSol(mouseIndic);
+			} else if (mouseIndic.parent != null) {
+				mouseIndic.parent.removeChild(mouseIndic);
+			}
+			
 			invalideView = false;
 		}
-		  _stage.update();
+		
+		_stage.update();
+		  
 		//_main.updateGridView();
     }
 	
@@ -181,14 +213,15 @@ class Main
 		trace("width : " + width + "| height : " + height);
 		_main.updateGridView();
 		
+		
 	}
 	
 	private var g:GridModel;
 	private var gview : Container;
 	
 	
-	private var userPos_x:Int=15;
-	private var userPos_y:Int=15;
+	private var userPos_x:Int=27;
+	private var userPos_y:Int=20;
 	private var userTile:PersoTile;
 	
 	private var anim:BitmapAnimation;
@@ -199,7 +232,7 @@ class Main
 		g.setBackGround("img/backgrounds/iso-2.jpg", 0, 0);
 		g.setMap("map/map_1.json");
 		
-		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("House_White",1)), 25, 25, 0);
+		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("House_White",2)), 25, 25, 0);
 		g.getTileAt(25, 25, 0).setTraversable(false);
 		g.getTileAt(26, 25, 0).setTraversable(false);
 		g.getTileAt(25, 26, 0).setTraversable(false);
@@ -249,13 +282,15 @@ class Main
 		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRoundFlower")), 27, 15, 0);
 		g.getTileAt(27, 15, 0).setTraversable(false);
 		
-		g.addTile(userTile = new PersoTile(GfxFactory.autoAnimfromLib.bind("perso_test")), userPos_x, userPos_y, 0);
+		g.addTile(userTile = new PersoTile(GfxFactory.autoAnimfromLib.bind("perso_anim")), userPos_x, userPos_y, 0);
 		userTile.x = 0;
 		path =  new Array<TileContentModel>();
 		
 		//TileEvent.getChannel().addEventListener(TileEvent.EVT_CLICK, evt_tileClick);
 		MapEvent.getChannel().addEventListener(MapEvent.EVT_CLICK, evt_MapClick);
 		MapEvent.getChannel().addEventListener(MapEvent.EVT_CTRLCLICK, evt_MapCtrlClick);
+		MapEvent.getChannel().addEventListener(MapEvent.EVT_ELEVEPLUS, evt_MapElevePlus);
+		MapEvent.getChannel().addEventListener(MapEvent.EVT_ELEVEMOINS, evt_MapEleveMoins);
 		
 	}
 	private var path:Array<TileContentModel>;
@@ -264,25 +299,49 @@ class Main
 		
 		trace("evt_MapClick " + e.initialData);
 		
-		var p = getGridPos(e.initialData);
-	
-		trace("p :" + p ) ;
-		if (!g.isInside(p.x, p.y)) return;
-		if (!g.getTileAt(p.x, p.y).isTraversable()) return;
-		helperMoveTo(p.x, p.y);
+		//var p = getGridPos(e.initialData);
+		if (currentMouseTarget != null) {
+		//	currentMouseTarget.setSol(GfxFactory.circle(255, 255, 0));
+			if (!currentMouseTarget.isTraversable()) return;
+			helperMoveTo(currentMouseTarget.x, currentMouseTarget.y);
+		}
+		
+		//if (!g.isInside(p.x, p.y)) return;
+		//if (!g.getTileAt(p.x, p.y).isTraversable()) return;
+		
 	}
+	private function evt_MapElevePlus(e:MapEvent):Void 
+	{
+		
+		trace("evt_MapElevePlus " + e.initialData);
+		if (currentMouseTarget != null) {
+			currentMouseTarget.setZ(currentMouseTarget.z+1);
+		
+		}
+		invalideView = true;
+		
+	}
+	private function evt_MapEleveMoins(e:MapEvent):Void 
+	{
+		trace("evt_MapEleveMoins " + e.initialData);
+		if (currentMouseTarget != null) {
+			currentMouseTarget.setZ(currentMouseTarget.z-1);
+		
+		}
+		invalideView = true;
+		
+	}
+	
 	private function evt_MapCtrlClick(e:MapEvent):Void 
 	{
-		var p = getGridPos(e.initialData);
-	
-		trace("p :" + p ) ;
-		if (!g.isInside(p.x, p.y)) return;
-		g.getTileAt(p.x, p.y).setTraversable(!g.getTileAt(p.x, p.y).isTraversable()); 
+
+		if (currentMouseTarget != null) {
+			currentMouseTarget.setTraversable(!currentMouseTarget.isTraversable());
+		
+		}
 		invalideView = true;
-		serialize();
+		
 	}
-	
-	
 	
 	
 	private function helperMoveTo(x:Int,y:Int) {
@@ -350,7 +409,11 @@ class Main
 		
 		//Tween.removeTweens(view);
 		var ddx:Float = (GridModel.tilesWidth  * (dy - dx) / 4);
+		
 		var ddy:Float = (GridModel.tilesHeight   * (dy + dx) / 4 );
+		var zs =  g.getTileAt(userPos_x, userPos_y).z * GridModel.HeightMultiplier;
+		var zf =  g.getTileAt(x, y).z * GridModel.HeightMultiplier;
+		var ddz : Float =  (zf-zs) / 2 ;
 		var sd = dx + dy;
 		// position anticipé de la position de l'utilisateur
 		
@@ -362,17 +425,17 @@ class Main
 		invalideView = true;
 		
 		helper_direction_move(userTile, dx, dy) ;
-		(mvTween=Tween.get(view,null,null,true)).to({ x:ddx, y:ddy }, speed).call(
+		(mvTween=Tween.get(view,null,null,true)).to({ x:ddx, y:ddy-(zs+ddz)}, speed).call(
 			function() {
 				
 				
 				updateDepthNearMove(userTile, from_x, from_y, x, y);
-				view.set( { x: -ddx, y: -ddy } );
+				view.set( { x: -ddx, y: -ddy-(zf-ddz) } );
 				userPos_x =  x;
 				userPos_y = y;
 				trace("alph complete userTile.dx "+ view.x + " userTile.dy " +view.y ); 
 				invalideView = true;
-				(mvTween=Tween.get(view,  { x: -ddx, y: -ddy } ,null,true)).to( { x:0, y:0 }, speed).call(
+				(mvTween=Tween.get(view,  null,null,true)).to( { x:0, y:-zf }, speed).call(
 					function() {
 						trace("complete userTile.dx " +view.x + " userTile.dy " +view.y ); 
 						//userPos_x =  x;
@@ -443,6 +506,7 @@ class Main
 	
 	public function updateGridView():Void {
 		//GridItemsView.refresh()
+		
 		if (gview == null) {
 			gview = new Container();
 			
@@ -472,16 +536,22 @@ class Main
 	}
 	
 	private function serialize() {
-		var r:Array<Array<Int>>;
-		r = new Array<Array<Int>>();
+		
+		var t:Array<Array<Int>> = new Array<Array<Int>>();
+		var p:Array<Array<Int>> = new Array<Array<Int>>();
+		
+		
 		for (x in 0...g.xSize) {
-				r[x] = new Array<Int>();
+				t[x] = new Array<Int>();
+				p[x] = new Array<Int>();
 				for (y in 0...g.ySize) {
-					r[x][y] = g.getTileAt(x, y).isTraversable()?1:0;		
+					t[x][y] = g.getTileAt(x, y).isTraversable()?1:0;
+					p[x][y] = g.getTileAt(x, y).z;
 				}
 				
 		}
-		 var js=Json.stringify(r);
+		var j:JsonTile = { p:p, t:t };
+		 var js=Json.stringify(j);
 		trace(js);
 	}
 	private function paintCount() {
@@ -541,10 +611,18 @@ class Main
 			}
 		}
 	}
-	private var idDebug:Int=0;
+	private var idDebug:Int = 0;
+	private var mouseIndic:DisplayObject;
+	private var currentMouseTarget:GridItems;
 	private function paintTile(x:Int, y:Int) {
 		var items:GridItems = g.getTileAt(x, y, 0);
 		var itView : DisplayObject = items.getView();
+		var over:Bool = false;
+		if (pointMouse!=null && items.collMouseCoord(pointMouse)) {
+			trace("MouseOver " + items.x + " " + items.y);
+			currentMouseTarget = items;
+			
+		}
 		if (itView == null) {
 			return;
 		}
@@ -555,7 +633,7 @@ class Main
 	//	if (p.x>-g.tilesWidth && p.x<width+g.tilesWidth && p.y>-g.tilesHeight && p.y<height+g.tilesHeight) {
 			gview.addChild(itView);
 			#if debug
-					items.setDebugText(Std.string(idDebug) + " " + Std.string(x) + "," + Std.string(y));
+					//items.setDebugText(/*Std.string(idDebug) + " " + */Std.string(x) + "," + Std.string(y));
 			#end
 					/*
 					gview.addChild(
@@ -583,3 +661,4 @@ class Main
 
 	
 }
+

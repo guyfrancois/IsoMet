@@ -228,12 +228,12 @@ class PathCell
 	}
 	public function set_parent(parent:PathCell) {
 		this.parent = parent;
-		cout = cell.cost
+		cout = cell.cost +Math.round(Math.pow(parent.cell.z-cell.z,2))*10
 			+ parent.cout
 			+ helper_direction( parent.cell.x - cell.x, parent.cell.y - cell.y);
 		score = cout + heuristic;
 		#if debug
-			cast(cell, GridItems).setDebugText(Std.string(score));
+			//cast(cell, GridItems).setDebugText(Std.string(score));
 		#end
 	}
 	private function helper_direction(dx:Int , dy:Int):Int {
@@ -246,7 +246,7 @@ class PathCell
 	}
 	
 	public function get_scoreWith(parent:PathCell):Int {
-		var cout = cell.cost + parent.cout + helper_direction( parent.cell.x - cell.x, parent.cell.y - cell.y);
+		var cout = cell.cost + Math.round(Math.pow(parent.cell.z-cell.z,2))*10 + parent.cout + helper_direction( parent.cell.x - cell.x, parent.cell.y - cell.y);
 		
 		return cout + heuristic;
 	}

@@ -10,9 +10,15 @@ import js.html.ImageElement;
  * ...
  * @author GuyF
  */
+
+ typedef JsonTile = {
+    var t : Array<Array<Int>>;// travsersable
+    var p : Array<Array<Int>>;//profondeur;
+}
+
 class GridModel 
 {
-
+	public static var HeightMultiplier : Int = 10;
 	public static var tilesWidth : Int = 64;
 	public static var tilesHeight : Int = 32;
 	
@@ -81,12 +87,13 @@ class GridModel
 	}
 	private function evt_mapLoad(e) {
 		trace("file loaded" + src_map);
-		var item = Main.loadQueue.getResult(src_map);
+		var item : JsonTile = Main.loadQueue.getResult(src_map);
 		if (item == null) return;
 		
 		for (x in 0...xSize) {
 			for (y in 0...ySize) {
-				items[x][y].setTraversable(item[x][y] == 1);
+				items[x][y].setTraversable(item.t[x][y] == 1);
+				items[x][y].setZ(item.p[x][y]);
 			}
     	}
 	

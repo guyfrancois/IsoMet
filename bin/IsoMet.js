@@ -156,6 +156,20 @@ events.PreloadJS.__name__ = true;
 events.Window = function() { }
 events.Window.__name__ = true;
 var gf = {}
+gf.GTools = function() { }
+gf.GTools.__name__ = true;
+gf.GTools.distance_manhattan = function(x0,y0,x1,y1) {
+	return gf.GTools.helper_absSub(x0,x1) + gf.GTools.helper_absSub(y0,y1);
+}
+gf.GTools.helper_absSub = function(a,b) {
+	return a > b?a - b:b - a;
+}
+gf.GTools.fdistance_manhattan = function(x0,y0,x1,y1) {
+	return gf.GTools.fhelper_absSub(x0,x1) + gf.GTools.fhelper_absSub(y0,y1);
+}
+gf.GTools.fhelper_absSub = function(a,b) {
+	return a > b?a - b:b - a;
+}
 gf.channels = {}
 gf.channels.DataBringerEvent = function(type,initialData) {
 	this.type = type;
@@ -375,13 +389,13 @@ var isoMet = {}
 isoMet.Main = function() {
 	this.idDebug = 0;
 	this.invalideView = false;
-	this.userPos_y = 15;
-	this.userPos_x = 15;
+	this.userPos_y = 20;
+	this.userPos_x = 27;
 	this.g = new isoMet.models.GridModel(50,50);
 	this.g.setBackGround("img/backgrounds/iso-2.jpg",0,0);
 	this.g.setMap("map/map_1.json");
 	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.spritefromLib("House_White",1);
+		return isoMet.view.GfxFactory.spritefromLib("House_White",2);
 	}),25,25,0);
 	this.g.getTileAt(25,25,0).setTraversable(false);
 	this.g.getTileAt(26,25,0).setTraversable(false);
@@ -461,17 +475,19 @@ isoMet.Main = function() {
 	}),27,15,0);
 	this.g.getTileAt(27,15,0).setTraversable(false);
 	this.g.addTile(this.userTile = new isoMet.models.PersoTile(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_test");
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
 	}),this.userPos_x,this.userPos_y,0);
 	this.userTile.x = 0;
 	this.path = new Array();
 	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CLICK,$bind(this,this.evt_MapClick));
 	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CTRLCLICK,$bind(this,this.evt_MapCtrlClick));
+	isoMet.channel.MapEvent.getChannel().addEventListener("evtEleveplus",$bind(this,this.evt_MapElevePlus));
+	isoMet.channel.MapEvent.getChannel().addEventListener("evtElevemoins",$bind(this,this.evt_MapEleveMoins));
 };
 isoMet.Main.__name__ = true;
 isoMet.Main.main = function() {
 	createjs.Ticker.useRAF = false;
-	createjs.Ticker.setFPS(60);
+	createjs.Ticker.setFPS(30);
 	isoMet.Main.mainContent = js.Browser.document.getElementById("mainContent");
 	isoMet.Main.mainContent.oncontextmenu = function(e) {
 		e.stopPropagation();
@@ -538,6 +554,11 @@ isoMet.Main.prototype = {
 	,paintTile: function(x,y) {
 		var items = this.g.getTileAt(x,y,0);
 		var itView = items.getView();
+		var over = false;
+		if(this.pointMouse != null && items.collMouseCoord(this.pointMouse)) {
+			console.log("MouseOver " + items.x + " " + items.y);
+			this.currentMouseTarget = items;
+		}
 		if(itView == null) return;
 		var p = itView.localToGlobal(0,0);
 		this.gview.addChild(itView);
@@ -597,19 +618,22 @@ isoMet.Main.prototype = {
 		}
 	}
 	,serialize: function() {
-		var r;
-		r = new Array();
+		var t = new Array();
+		var p = new Array();
 		var _g1 = 0, _g = this.g.xSize;
 		while(_g1 < _g) {
 			var x = _g1++;
-			r[x] = new Array();
+			t[x] = new Array();
+			p[x] = new Array();
 			var _g3 = 0, _g2 = this.g.ySize;
 			while(_g3 < _g2) {
 				var y = _g3++;
-				r[x][y] = this.g.getTileAt(x,y).isTraversable()?1:0;
+				t[x][y] = this.g.getTileAt(x,y).isTraversable()?1:0;
+				p[x][y] = this.g.getTileAt(x,y).z;
 			}
 		}
-		var js = haxe.Json.stringify(r);
+		var j = { p : p, t : t};
+		var js = haxe.Json.stringify(j);
 		console.log(js);
 	}
 	,updateGridView: function() {
@@ -654,6 +678,9 @@ isoMet.Main.prototype = {
 		var view = this.userTile.getView();
 		var ddx = isoMet.models.GridModel.tilesWidth * (dy - dx) / 4;
 		var ddy = isoMet.models.GridModel.tilesHeight * (dy + dx) / 4;
+		var zs = this.g.getTileAt(this.userPos_x,this.userPos_y).z * isoMet.models.GridModel.HeightMultiplier;
+		var zf = this.g.getTileAt(x,y).z * isoMet.models.GridModel.HeightMultiplier;
+		var ddz = (zf - zs) / 2;
 		var sd = dx + dy;
 		this.userPos_x = x;
 		this.userPos_y = y;
@@ -661,14 +688,14 @@ isoMet.Main.prototype = {
 		console.log("speed" + speed);
 		this.invalideView = true;
 		this.helper_direction_move(this.userTile,dx,dy);
-		(this.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : ddx, y : ddy},speed).call(function() {
+		(this.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : ddx, y : ddy - (zs + ddz)},speed).call(function() {
 			_g.updateDepthNearMove(_g.userTile,from_x,from_y,x,y);
-			view.set({ x : -ddx, y : -ddy});
+			view.set({ x : -ddx, y : -ddy - (zf - ddz)});
 			_g.userPos_x = x;
 			_g.userPos_y = y;
 			console.log("alph complete userTile.dx " + view.x + " userTile.dy " + view.y);
 			_g.invalideView = true;
-			(_g.mvTween = createjs.Tween.get(view,{ x : -ddx, y : -ddy},null,true)).to({ x : 0, y : 0},speed).call(function() {
+			(_g.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : 0, y : -zf},speed).call(function() {
 				console.log("complete userTile.dx " + view.x + " userTile.dy " + view.y);
 				var next = _g.path.pop();
 				if(next != null) {
@@ -696,26 +723,40 @@ isoMet.Main.prototype = {
 		}
 	}
 	,evt_MapCtrlClick: function(e) {
-		var p = this.getGridPos(e.initialData);
-		console.log("p :" + Std.string(p));
-		if(!this.g.isInside(p.x,p.y)) return;
-		this.g.getTileAt(p.x,p.y).setTraversable(!this.g.getTileAt(p.x,p.y).isTraversable());
+		if(this.currentMouseTarget != null) this.currentMouseTarget.setTraversable(!this.currentMouseTarget.isTraversable());
 		this.invalideView = true;
-		this.serialize();
+	}
+	,evt_MapEleveMoins: function(e) {
+		console.log("evt_MapEleveMoins " + Std.string(e.initialData));
+		if(this.currentMouseTarget != null) this.currentMouseTarget.setZ(this.currentMouseTarget.z - 1);
+		this.invalideView = true;
+	}
+	,evt_MapElevePlus: function(e) {
+		console.log("evt_MapElevePlus " + Std.string(e.initialData));
+		if(this.currentMouseTarget != null) this.currentMouseTarget.setZ(this.currentMouseTarget.z + 1);
+		this.invalideView = true;
 	}
 	,evt_MapClick: function(e) {
 		console.log("evt_MapClick " + Std.string(e.initialData));
-		var p = this.getGridPos(e.initialData);
-		console.log("p :" + Std.string(p));
-		if(!this.g.isInside(p.x,p.y)) return;
-		if(!this.g.getTileAt(p.x,p.y).isTraversable()) return;
-		this.helperMoveTo(p.x,p.y);
+		if(this.currentMouseTarget != null) {
+			if(!this.currentMouseTarget.isTraversable()) return;
+			this.helperMoveTo(this.currentMouseTarget.x,this.currentMouseTarget.y);
+		}
 	}
 	,tickHandler: function() {
+		var newp = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
+		if(this.pointMouse == null || gf.GTools.fdistance_manhattan(newp.x,newp.y,this.pointMouse.x,this.pointMouse.y) > 2) {
+			this.pointMouse = newp;
+			this.invalideView = true;
+		}
 		var fps = js.Browser.document.getElementById("fps");
 		fps.innerHTML = Std.string("FPS :" + (createjs.Ticker.getMeasuredFPS() * 10 | 0) / 10);
 		if(this.mvTween != null || this.invalideView) {
+			if(this.currentMouseTarget != null) this.currentMouseTarget.update();
+			this.currentMouseTarget = null;
 			this.paintCount();
+			if(this.mouseIndic == null) this.mouseIndic = isoMet.view.GfxFactory.circle(255,255,0);
+			if(this.currentMouseTarget != null) this.currentMouseTarget.setSol(this.mouseIndic); else if(this.mouseIndic.parent != null) this.mouseIndic.parent.removeChild(this.mouseIndic);
 			this.invalideView = false;
 		}
 		isoMet.Main._stage.update();
@@ -731,6 +772,15 @@ isoMet.Main.prototype = {
 		switch(e.keyCode) {
 		case 32:
 			this.userTile.cmd(isoMet.models.ANIM.ROCK);
+			isoMet.Main._main.serialize();
+			break;
+		case 107:
+			var p = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
+			isoMet.channel.MapEvent.sdispatch("evtEleveplus",p);
+			break;
+		case 109:
+			var p = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
+			isoMet.channel.MapEvent.sdispatch("evtElevemoins",p);
 			break;
 		default:
 			null;
@@ -912,7 +962,7 @@ isoMet.controler.PathCell.prototype = {
 		return this.parent;
 	}
 	,get_scoreWith: function(parent) {
-		var cout = this.cell.cost + parent.cout + this.helper_direction(parent.cell.x - this.cell.x,parent.cell.y - this.cell.y);
+		var cout = this.cell.cost + Math.round(Math.pow(parent.cell.z - this.cell.z,2)) * 10 + parent.cout + this.helper_direction(parent.cell.x - this.cell.x,parent.cell.y - this.cell.y);
 		return cout + this.heuristic;
 	}
 	,helper_direction: function(dx,dy) {
@@ -921,7 +971,7 @@ isoMet.controler.PathCell.prototype = {
 	}
 	,set_parent: function(parent) {
 		this.parent = parent;
-		this.cout = this.cell.cost + parent.cout + this.helper_direction(parent.cell.x - this.cell.x,parent.cell.y - this.cell.y);
+		this.cout = this.cell.cost + Math.round(Math.pow(parent.cell.z - this.cell.z,2)) * 10 + parent.cout + this.helper_direction(parent.cell.x - this.cell.x,parent.cell.y - this.cell.y);
 		this.score = this.cout + this.heuristic;
 	}
 	,__class__: isoMet.controler.PathCell
@@ -993,6 +1043,20 @@ isoMet.models.GridItems.prototype = $extend(isoMet.models.TileContentModel.proto
 	,addTile: function(tile,z) {
 		this.invalideView = true;
 		this.items.push(tile);
+		tile.getView().y = tile.y - z * isoMet.models.GridModel.HeightMultiplier;
+		tile.getView().x = tile.x;
+	}
+	,setZ: function(z) {
+		this.z = z;
+		var _g = 0, _g1 = this.items;
+		while(_g < _g1.length) {
+			var item = _g1[_g];
+			++_g;
+			item.getView().y = item.y - z * isoMet.models.GridModel.HeightMultiplier;
+			item.getView().x = item.x;
+		}
+		this.updateTraversable();
+		this.invalideView = true;
 	}
 	,updateContainer: function() {
 		var view;
@@ -1004,7 +1068,10 @@ isoMet.models.GridItems.prototype = $extend(isoMet.models.TileContentModel.proto
 		} else {
 			view.x = this.xx;
 			view.y = this.yy;
-			if(this.sol != null) view.addChild(this.sol);
+			if(this.sol != null) {
+				this.sol.y = -this.z * isoMet.models.GridModel.HeightMultiplier;
+				view.addChild(this.sol);
+			}
 			var _g = 0, _g1 = this.items;
 			while(_g < _g1.length) {
 				var item = _g1[_g];
@@ -1020,6 +1087,7 @@ isoMet.models.GridItems.prototype = $extend(isoMet.models.TileContentModel.proto
 	}
 	,updateTraversable: function() {
 		console.log("GridItems updateTraversable " + this.x + " " + this.y + " " + Std.string(this.traversable));
+		this.sol = null;
 	}
 	,getView: function() {
 		this.update();
@@ -1030,15 +1098,28 @@ isoMet.models.GridItems.prototype = $extend(isoMet.models.TileContentModel.proto
 		if(this.invalideView) this.updateContainer();
 	}
 	,setSol: function(sol) {
+		var _g = this;
 		this.invalideView = true;
 		if(this.view == null) return;
 		this.sol = sol;
 		if(this.invalideView) this.updateContainer();
+		if(this.timerSol != null) this.timerSol.stop();
+		this.timerSol = haxe.Timer.delay(function() {
+			_g.invalideView = true;
+			_g.updateTraversable();
+			if(_g.invalideView) _g.updateContainer();
+		},250);
+	}
+	,collMouseCoord: function(m) {
+		if(!this.traversable) return false;
+		var p = new createjs.Point(this.xx,this.yy - this.z * isoMet.models.GridModel.HeightMultiplier);
+		if(Math.abs(p.x - m.x) < isoMet.models.GridModel.tilesWidth / 2 && Math.abs(p.y - m.y) < isoMet.models.GridModel.tilesHeight / 2) return true;
+		return false;
 	}
 	,setViewCoord: function(x,y) {
+		this.invalideView = this.xx != x || this.yy != y;
 		this.xx = x;
 		this.yy = y;
-		this.invalideView = true;
 	}
 	,setView: function(view) {
 		this.invalideView = true;
@@ -1092,7 +1173,8 @@ isoMet.models.GridModel.prototype = {
 			var _g3 = 0, _g2 = this.ySize;
 			while(_g3 < _g2) {
 				var y = _g3++;
-				this.items[x][y].setTraversable(item[x][y] == 1);
+				this.items[x][y].setTraversable(item.t[x][y] == 1);
+				this.items[x][y].setZ(item.p[x][y]);
 			}
 		}
 	}
@@ -1278,6 +1360,17 @@ isoMet.view.GfxFactory.spritefromLib = function(id,scale) {
 	ret.mouseEnabled = false;
 	return ret;
 }
+isoMet.view.GfxFactory.circle = function(r,g,b) {
+	if(b == null) b = 200;
+	if(g == null) g = 200;
+	if(r == null) r = 200;
+	var color = createjs.Graphics.getRGB(r,g,b,1);
+	var w_2 = Math.round(isoMet.models.GridModel.tilesWidth / 2);
+	var h_2 = Math.round(isoMet.models.GridModel.tilesHeight / 2);
+	var gfx = new createjs.Shape();
+	gfx.graphics.beginStroke(color).drawEllipse(-w_2 / 2,-h_2 / 2,w_2,h_2).closePath();
+	return gfx;
+}
 isoMet.view.GfxFactory.sol = function(fill,alpha) {
 	if(alpha == null) alpha = .0;
 	if(fill == null) fill = "#CCCCCC";
@@ -1286,6 +1379,20 @@ isoMet.view.GfxFactory.sol = function(fill,alpha) {
 	var gfx = new createjs.Shape();
 	gfx.alpha = alpha;
 	gfx.graphics.beginFill(fill).beginStroke("#FFCC00").moveTo(w_2,0).lineTo(0,-h_2).lineTo(-w_2,0).lineTo(0,h_2).lineTo(w_2,0).closePath();
+	return gfx;
+}
+isoMet.view.GfxFactory.solEl = function(r,g,b) {
+	if(b == null) b = 200;
+	if(g == null) g = 200;
+	if(r == null) r = 200;
+	var color = createjs.Graphics.getRGB(r,g,b,0.5);
+	var color_g = createjs.Graphics.getRGB(Math.round(0.8 * r),Math.round(0.8 * g),Math.round(0.8 * b),0.5);
+	var color_d = createjs.Graphics.getRGB(Math.round(0.6 * r),Math.round(0.6 * g),Math.round(0.6 * b),0.5);
+	var w_2 = Math.round(isoMet.models.GridModel.tilesWidth / 2);
+	var h_2 = Math.round(isoMet.models.GridModel.tilesHeight / 2);
+	var gfx = new createjs.Shape();
+	gfx.graphics.beginFill(color).beginStroke(color_g).moveTo(w_2,0).lineTo(0,-h_2).lineTo(-w_2,0).lineTo(0,h_2).lineTo(w_2,0);
+	gfx.graphics.closePath();
 	return gfx;
 }
 isoMet.view.GfxFactory.mur = function(r,g,b) {
@@ -1466,8 +1573,11 @@ gf.channels.EventChannel.defaultChannel = "defaultChannel";
 isoMet.channel.MapEvent.EVENT_CHANNEL_NAME = "mapChannel";
 isoMet.channel.MapEvent.EVT_CLICK = "evt_click";
 isoMet.channel.MapEvent.EVT_CTRLCLICK = "evt_CTRLclick";
+isoMet.channel.MapEvent.EVT_ELEVEPLUS = "evtEleveplus";
+isoMet.channel.MapEvent.EVT_ELEVEMOINS = "evtElevemoins";
 isoMet.channel.TileEvent.EVENT_CHANNEL_NAME = "tileChannel";
 isoMet.channel.TileEvent.EVT_CLICK = "evt_click";
+isoMet.models.GridModel.HeightMultiplier = 10;
 isoMet.models.GridModel.tilesWidth = 64;
 isoMet.models.GridModel.tilesHeight = 32;
 js.Browser.window = typeof window != "undefined" ? window : null;

@@ -116,6 +116,27 @@ class GfxFactory
 		
 	}
 	
+	public static function circle(r:Int = 200, g:Int = 200, b:Int = 200):DisplayObject {
+		var color = Graphics.getRGB(r, g, b, 1);
+		var w_2 = Math.round(GridModel.tilesWidth / 2);
+		var h_2 = Math.round(GridModel.tilesHeight / 2);
+		var gfx = new Shape();
+		
+        //On accéde a la propriété graphics
+        gfx.graphics
+                //On initie un nouveau tracé (ici, gris)
+               
+				.beginStroke(color)
+                //On applique les actions vues dans le schémà
+                //.moveTo(-w_2/2, -h_2/2)
+				.drawEllipse(-w_2/2,-h_2/2, w_2, h_2)
+				//.drawCircle(0,0,w_4)
+                
+                //On termine le tracé.
+                .closePath();
+        return gfx;
+	}
+	
 	public static function sol(fill:String = "#CCCCCC", alpha:Float = .0):DisplayObject {
 		var w_2 = Math.round(GridModel.tilesWidth / 2);
 		var h_2 = Math.round(GridModel.tilesHeight / 2);
@@ -135,6 +156,41 @@ class GfxFactory
                 //On termine le tracé.
                 .closePath();
         return gfx;
+	}
+	public static function solEl(r:Int = 200, g:Int = 200, b:Int = 200):DisplayObject {
+		var color = Graphics.getRGB(r, g, b, 0.5);
+		var color_g = Graphics.getRGB(Math.round(0.8*r), Math.round(0.8*g), Math.round(0.8*b),0.5);
+		var color_d = Graphics.getRGB(Math.round(0.6*r), Math.round(0.6*g), Math.round(0.6*b),0.5);
+		var w_2 = Math.round(GridModel.tilesWidth / 2);
+		var h_2 = Math.round(GridModel.tilesHeight / 2);
+		var gfx = new Shape();
+		
+        //On accéde a la propriété graphics
+        gfx.graphics
+                //On initie un nouveau tracé (ici, gris)
+                .beginFill(color)
+				.beginStroke(color_g)
+                //On applique les actions vues dans le schémà
+                .moveTo(w_2,0)
+                .lineTo(0,-h_2)
+                .lineTo(-w_2,0)
+                .lineTo(0,h_2)
+                .lineTo(w_2, 0);
+                //On termine le tracé.
+				/**
+				*  Face  av droite.
+				*/
+				//gfx.graphics.beginFill(color_d)
+				//.moveTo(w_2, 0).lineTo(w_2, z).lineTo(0, z + h_2).lineTo(0, h_2).lineTo(w_2, 0);
+				
+				/**
+				*  Face  av gauche.
+				*/
+				//gfx.graphics.beginFill(color_g)
+				//.moveTo(-w_2, 0).lineTo(-w_2, z).lineTo(0, z + h_2).lineTo(0, h_2).lineTo(-w_2, 0);
+		
+                gfx.graphics.closePath();
+		 return gfx;
 	}
 	
 	public static function mur(r:Int = 200, g:Int = 200, b:Int = 200):DisplayObject {

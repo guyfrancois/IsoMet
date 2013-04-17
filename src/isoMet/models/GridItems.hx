@@ -2,6 +2,7 @@ package isoMet.models;
 import createjs.easeljs.Container;
 import createjs.easeljs.DisplayObject;
 import createjs.easeljs.MouseEvent;
+import createjs.easeljs.Point;
 import createjs.easeljs.Text;
 import events.Mouse;
 import haxe.Timer;
@@ -37,6 +38,7 @@ class GridItems extends TileContentModel
 	#if debug
 	public function setDebugText(s:String) { 
 		debugInfo.text = s;
+		
 		Timer.delay(function() {
 				debugInfo.text = "";
 			}, 1000);
@@ -52,25 +54,41 @@ class GridItems extends TileContentModel
 	private var xx:Float;
 	private var yy:Float;
 	public function setViewCoord(x:Float, y:Float):Void {
+		invalideView = (xx != x) || (yy != y) ;
 		xx = x;
 		yy = y;
-		invalideView = true;
-		
-		
 	}
+	public function collMouseCoord(m:Point):Bool {
+		#if debug
+		#else
+		if (!traversable) return false;
+		#end
+		var p = new Point(xx, yy - z * GridModel.HeightMultiplier);
+		if ((Math.abs(p.x - m.x) < GridModel.tilesWidth/2) && (Math.abs(p.y - m.y) < GridModel.tilesHeight/2)) {
+			return true;
+		}
+		return false;
+	}
+	
+	var timerSol:Timer;
 	public function setSol(sol:DisplayObject) { 
 		invalideView = true;
 		if (view == null)  return;
 		this.sol = sol;
 		if (invalideView) updateContainer();
-		#if debug
-		Timer.delay(function() {
+		
+		if (timerSol != null) {
+			timerSol.stop();
+		}
+		timerSol=Timer.delay(function() {
 			invalideView = true;
 			updateTraversable();
 			if (invalideView) updateContainer();
 		}
-		, 1000);
-		#end
+		, 250);
+		
+		//#if debug
+		//#end
 		
 		
 	}
@@ -97,17 +115,37 @@ class GridItems extends TileContentModel
 		}
 		return view;
 	}
+	#if debug
+	var soltrav : DisplayObject;
+	var solNontrav : DisplayObject;
+	#end
 	
 	override private function updateTraversable() {
 		trace("GridItems updateTraversable " + x + " " + y + " " + traversable);
+		
 		#if debug
-		sol = GfxFactory.sol(traversable?"#CCCCCC":"#FF0000", traversable?0:0.5);
-		if (!traversable) {
-			sol = GfxFactory.sol(traversable?"#CCCCCC":"#FF0000", traversable?0:0.5);
-		} else {
-			sol = null;
+		//sol = GfxFactory.sol(traversable?"#CCCCCC":"#FF0000", traversable?0:0.5);
+		//if (sol != null && sol != solNontrav && sol != soltrav) return;	
+		if (!traversable && sol!=solNontrav || sol==null) {
+			if (solNontrav == null) {
+				solNontrav = GfxFactory.solEl(250, 0, 0);
+				
+			}
+			sol = solNontrav;
+			invalideView = true;
+			
+		} else if (sol!=soltrav || sol==null)  {
+			
+			if (soltrav == null ) {
+				soltrav = GfxFactory.solEl(25 * z, 25 * z, 25 * z);
+				
+			}
+			sol = soltrav;
+			invalideView = true;
 		}
-		invalideView = true;
+		
+		#else
+			sol = null;
 		#end
 		
 	}
@@ -126,6 +164,12 @@ class GridItems extends TileContentModel
 		} else {
 			this.view = view = new Container();
 		}
+		#if debug
+		if (sol == null) {
+			updateTraversable();
+		}
+			
+		#end
 		if (sol == null && items.length == 0) {
 			
 			//view = null;
@@ -135,9 +179,11 @@ class GridItems extends TileContentModel
 			view.x = xx;
 			view.y = yy;
 			if (sol != null) {
+				sol.y = -z * GridModel.HeightMultiplier;
 				view.addChild(sol);
 			}
 			for (item in items) {
+				
 				view.addChild(item.getView());
 			}
 			#if debug
@@ -151,11 +197,30 @@ class GridItems extends TileContentModel
 		
 	}
 	private var invalideView:Bool = false;
+	public function setZ(z:Int) 
+	{
+		
+		this.z = z;
+		for (item in items) {
+				
+			item.getView().y = item.y - z * GridModel.HeightMultiplier;
+			item.getView().x = item.x;
+		}
+		updateTraversable();
+		
+		invalideView = true;
+		//items.push(tile);
+		
+		
+		
+	}
 	public function addTile(tile:TileContentModel, z:Int) 
 	{
 		//tile.setMapCoords( z);
 		invalideView = true;
 		items.push(tile);
+		tile.getView().y = tile.y - z * GridModel.HeightMultiplier;
+		tile.getView().x = tile.x;
 		
 		
 	}

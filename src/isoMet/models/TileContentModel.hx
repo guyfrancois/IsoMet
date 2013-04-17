@@ -20,6 +20,7 @@ class TileContentModel
 	public var z:Int; // profondeur d'affichage
 	
 	
+	
 	public var traversable:Bool;
 	public var cost : Int;
 	//private var viewBuilder = isoMet.view.GfxFactory.mur;

@@ -15,7 +15,7 @@ $(function () {
     var classList = [];
 
     var stage = new createjs.Stage($("#mainCanvas")[0]);
-    createjs.Ticker.setFPS(60);
+    createjs.Ticker.setFPS(30);
     createjs.Ticker.addListener(function () {
     	stage.update();
     });     
