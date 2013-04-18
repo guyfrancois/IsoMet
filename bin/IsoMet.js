@@ -478,6 +478,36 @@ isoMet.Main = function() {
 		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
 	}),this.userPos_x,this.userPos_y,0);
 	this.userTile.x = 0;
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),29,19,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),29,18,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),30,17,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),29,16,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),29,15,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),30,14,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),30,13,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),29,13,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),29,12,0);
+	this.g.addTile(new isoMet.models.TileContentModel(function() {
+		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
+	}),30,12,0);
 	this.path = new Array();
 	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CLICK,$bind(this,this.evt_MapClick));
 	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CTRLCLICK,$bind(this,this.evt_MapCtrlClick));

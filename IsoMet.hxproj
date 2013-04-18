@@ -47,7 +47,7 @@
   <options>
     <option showHiddenPaths="False" />
     <option testMovie="OpenDocument" />
-    <option testMovieCommand="bin/index.html" />
+    <option testMovieCommand="http://localhost/haxe/IsoMet/bin/index.html" />
   </options>
   <!-- Plugin storage -->
   <storage />

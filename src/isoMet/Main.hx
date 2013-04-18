@@ -284,6 +284,27 @@ class Main
 		
 		g.addTile(userTile = new PersoTile(GfxFactory.autoAnimfromLib.bind("perso_anim")), userPos_x, userPos_y, 0);
 		userTile.x = 0;
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 19, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 18, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 17, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 16, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 15, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 14, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 13, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 13, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 12, 0);
+		
+		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 12, 0);
+		
 		path =  new Array<TileContentModel>();
 		
 		//TileEvent.getChannel().addEventListener(TileEvent.EVT_CLICK, evt_tileClick);
