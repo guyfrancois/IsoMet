@@ -11,7 +11,7 @@ import js.html.svg.AnimatedBoolean;
  */
 class Astar_2
 {
-	public var MAX_ITERATIONS:Int = 500;
+	public var MAX_ITERATIONS:Int = 2000;
 	
 	public var gridWidth:Int;
 	public var gridHeight:Int;

@@ -160,7 +160,7 @@ class GridItems extends TileContentModel
 		var view:Container;
 		if (this.view != null) {
 			view = cast(this.view, Container);
-			view.removeAllChildren();
+			
 		} else {
 			this.view = view = new Container();
 		}
@@ -175,7 +175,7 @@ class GridItems extends TileContentModel
 			//view = null;
 			
 		} else {
-			
+			view.removeAllChildren();
 			view.x = xx;
 			view.y = yy;
 			if (sol != null) {
@@ -203,8 +203,8 @@ class GridItems extends TileContentModel
 		this.z = z;
 		for (item in items) {
 				
-			item.getView().y = item.y - z * GridModel.HeightMultiplier;
-			item.getView().x = item.x;
+			item.getView().y = - z * GridModel.HeightMultiplier + item.yOffset;
+			item.getView().x = item.xOffset;
 		}
 		updateTraversable();
 		
@@ -219,11 +219,22 @@ class GridItems extends TileContentModel
 		//tile.setMapCoords( z);
 		invalideView = true;
 		items.push(tile);
-		tile.getView().y = tile.y - z * GridModel.HeightMultiplier;
-		tile.getView().x = tile.x;
+		tile.getView().y = tile.yOffset - z * GridModel.HeightMultiplier;
+		tile.getView().x = tile.xOffset;
+		items.sort(tileSort);
 		
 		
 	}
+	private function tileSort(x:TileContentModel, y:TileContentModel):Int {
+		return Math.round(y.yOffset-x.yOffset );
+		/*
+>0 if x should appear after y
+<0 if x should appear before y
+*/
+		
+	}
+
+
 	
 	public function removeTile(tile:TileContentModel, z:Int) : Bool
 	{
@@ -232,6 +243,26 @@ class GridItems extends TileContentModel
 		
 		
 		return ret;
+	}
+	
+	public function serialize():Array<JsonTileItem> {
+		var arr = new Array<JsonTileItem>();
+		for (item in items) {
+			//item.
+			arr.push(
+				{
+					x:x,
+					y:y,
+					xOffset:item.xOffset,
+					yOffset:item.yOffset,
+					factory:item.factory,
+					item:item.item
+				}
+			);
+			
+			
+		}
+		return arr;
 	}
 	
 	

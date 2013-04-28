@@ -1,7 +1,9 @@
 package isoMet.models;
+import createjs.easeljs.Container;
 import createjs.easeljs.DisplayObject;
 import createjs.easeljs.MouseEvent;
 import events.Mouse;
+import isoMet.view.GfxFactory;
 
 import js.html.Float32Array;
 
@@ -12,6 +14,16 @@ import js.html.Float32Array;
  * ...
  * @author GuyF
  */
+typedef JsonTileItem = {
+	var x:Int;
+	var y:Int;
+	var xOffset:Float;
+	var yOffset:Float;
+	var factory:String; // spritefromLib
+	var item:String;
+    
+}
+
 class TileContentModel
 {
 	// coordonnées sur la grille
@@ -19,15 +31,33 @@ class TileContentModel
 	public var y:Int;
 	public var z:Int; // profondeur d'affichage
 	
+	public var factory:String; // spritefromLib
+	public var item:String;
 	
+	public var xOffset:Float;
+	public var yOffset:Float;
 	
 	public var traversable:Bool;
 	public var cost : Int;
 	//private var viewBuilder = isoMet.view.GfxFactory.mur;
 	private var viewBuilder : Void  -> DisplayObject;
-	
+	public function new(?json:JsonTileItem) 
+	{
+		
+		
+		if (json == null) {
+			
+		} else {
+			this.factory = json.factory;
+			this.item = json.item;
+			this.xOffset = json.xOffset;
+			this.yOffset = json.yOffset;
+			build(GfxFactory.builder(factory, [item]));
+		}
+		init();
+	}
 
-	public function new(?viewBuilder:Void  -> DisplayObject) 
+	private function build(?viewBuilder:Void  -> DisplayObject) 
 	{
 		if (viewBuilder == null) {
 			this.viewBuilder = function() {
@@ -38,6 +68,9 @@ class TileContentModel
 		}
 		
 		
+		
+	}
+	private function init():Void {
 		x = 0;
 		y = 0;
 		z = 0;
@@ -89,7 +122,8 @@ class TileContentModel
 	public function getView():DisplayObject {
 		if (view==null) {
 		 view = viewBuilder();// isoMet.view.GfxFactory.mur();
-		
+		 //view.x = ;
+		 //view.y = yOffset;
 		
 		 //view.addEventListener(Mouse.CLICK, evt_mouseDown);
 		 //view.addEventListener("contextmenu", evt_contectMenu);

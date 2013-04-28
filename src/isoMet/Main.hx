@@ -134,6 +134,7 @@ class Main
 		}
 		
 	}
+	
 	private function evt_key(e:Dynamic) {
 		trace("evt_key" + e.keyCode );
 		switch (e.keyCode) {
@@ -229,81 +230,9 @@ class Main
 	public function new ():Void {
 		
 		g = new GridModel(50, 50);
-		g.setBackGround("img/backgrounds/iso-2.jpg", 0, 0);
 		g.setMap("map/map_1.json");
-		
-		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("House_White",2)), 25, 25, 0);
-		g.getTileAt(25, 25, 0).setTraversable(false);
-		g.getTileAt(26, 25, 0).setTraversable(false);
-		g.getTileAt(25, 26, 0).setTraversable(false);
-		g.getTileAt(26, 26, 0).setTraversable(false);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("Flag")), 8, 19, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 30, 30, 0);
-		g.getTileAt(30, 30, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 31, 30, 0);
-		g.getTileAt(31, 30, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 32, 30, 0);
-		g.getTileAt(32, 30, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 30, 31, 0);
-		g.getTileAt(30, 31, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 30, 32, 0);
-		g.getTileAt(30, 32, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 32, 31, 0);
-		g.getTileAt(32, 31, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 32, 32, 0);
-		g.getTileAt(32, 32, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.mur.bind()), 31, 32, 0);
-		g.getTileAt(31, 32, 0).setTraversable(false);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("Flag")), 31, 31, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("Flag")), 40, 35, 0);
-		
-		//g.getTileAt(8, 8, 0).setTraversable(false);
-		
-		
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("Bush")), 23, 15, 0);
-		g.getTileAt(23, 15, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("Store_Medium")), 23, 16, 0);
-		g.getTileAt(23, 16, 0).setTraversable(false);
-		
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeCone")), 23, 17, 0);
-		g.getTileAt(23, 17, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeApple")), 23, 18, 0);
-		g.getTileAt(23, 18, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("House1")), 24, 15, 0);
-		g.getTileAt(24, 15, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.spritefromLib.bind("Windmill")), 25, 15, 0);
-		g.getTileAt(25, 15, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRound")), 26, 18, 0);
-		g.getTileAt( 26, 18, 0).setTraversable(false);
-		g.addTile(new TileContentModel(GfxFactory.displayObjectfromLib.bind("TreeRoundFlower")), 27, 15, 0);
-		g.getTileAt(27, 15, 0).setTraversable(false);
-		
-		g.addTile(userTile = new PersoTile(GfxFactory.autoAnimfromLib.bind("perso_anim")), userPos_x, userPos_y, 0);
+		g.addTile(userTile = new PersoTile("perso_anim"), userPos_x, userPos_y, 0);
 		userTile.x = 0;
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 19, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 18, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 17, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 16, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 15, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 14, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 13, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 13, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 29, 12, 0);
-		
-		g.addTile(new TileContentModel(GfxFactory.autoAnimfromLib.bind("perso_anim")), 30, 12, 0);
 		
 		path =  new Array<TileContentModel>();
 		
@@ -440,12 +369,12 @@ class Main
 		
 		userPos_x =  x;
 		userPos_y = y;
-		var speed = alphMoveSpeed  * helper_direction(dx, dy);
+		var speed = Math.round(alphMoveSpeed  * (helper_direction(dx, dy)+ddz));
 		
 		trace("speed" + speed);	
 		invalideView = true;
 		
-		helper_direction_move(userTile, dx, dy) ;
+		helper_direction_move(userTile, dx, dy,ddz) ;
 		(mvTween=Tween.get(view,null,null,true)).to({ x:ddx, y:ddy-(zs+ddz)}, speed).call(
 			function() {
 				
@@ -480,29 +409,29 @@ class Main
 		);
 	}
 	
-	private function helper_direction_move(pj:PersoTile,dx:Int , dy:Int) {
-		
+	private function helper_direction_move(pj:PersoTile,dx:Int , dy:Int,ddz:Float) {
+		var f = 1 + ddz / 10;
 		if (dx > 0) { // gauche
 			if (dy > 0) {
-				userTile.cmd(ANIM.W_B);
+				userTile.cmd(ANIM.W_B,f);
 			} else if (dy < 0) {
-				userTile.cmd(ANIM.W_G);
+				userTile.cmd(ANIM.W_G,f);
 			} else {
-				userTile.cmd(ANIM.W_BG);
+				userTile.cmd(ANIM.W_BG,f);
 			}
 		} else if (dx < 0) {
 			if (dy > 0) {
-				userTile.cmd(ANIM.W_D);
+				userTile.cmd(ANIM.W_D,f);
 			} else if (dy < 0) {
-				userTile.cmd(ANIM.W_H);
+				userTile.cmd(ANIM.W_H,f);
 			} else {
-				userTile.cmd(ANIM.W_HD);
+				userTile.cmd(ANIM.W_HD,f);
 			}
 		} else  {
 			if (dy > 0) {
-				userTile.cmd(ANIM.W_BD);
+				userTile.cmd(ANIM.W_BD,f);
 			} else if (dy < 0) {
-				userTile.cmd(ANIM.W_HG);
+				userTile.cmd(ANIM.W_HG,f);
 			} else {
 				userTile.cmd(ANIM.IDLE);
 			}
@@ -557,23 +486,8 @@ class Main
 	}
 	
 	private function serialize() {
+		trace(g.serialize());
 		
-		var t:Array<Array<Int>> = new Array<Array<Int>>();
-		var p:Array<Array<Int>> = new Array<Array<Int>>();
-		
-		
-		for (x in 0...g.xSize) {
-				t[x] = new Array<Int>();
-				p[x] = new Array<Int>();
-				for (y in 0...g.ySize) {
-					t[x][y] = g.getTileAt(x, y).isTraversable()?1:0;
-					p[x][y] = g.getTileAt(x, y).z;
-				}
-				
-		}
-		var j:JsonTile = { p:p, t:t };
-		 var js=Json.stringify(j);
-		trace(js);
 	}
 	private function paintCount() {
 		if (gview == null) {

@@ -1,6 +1,8 @@
 package isoMet.models;
 import createjs.easeljs.DisplayObject;
 import createjs.easeljs.MovieClip;
+import createjs.easeljs.BitmapAnimation;
+import haxe.macro.Format;
 
 /**
  * ...
@@ -28,9 +30,9 @@ enum ANIM {
 class PersoTile extends TileContentModel
 {
 
-	public function new(?viewBuilder:Void -> DisplayObject) 
+	public function new(item:String) 
 	{
-		super(viewBuilder);
+		super({x:0,y:0,xOffset:0,yOffset:0,factory:"animFromLib",item:item});
 		lastCmd = IDLE;
 	}
 	
@@ -48,13 +50,14 @@ class PersoTile extends TileContentModel
 		//	return throw "abstract method isoMet.models.TileContentModel::getView not implemented by"+Type.getClassName(Type.getClass(this));
 	}
 	private var lastCmd:ANIM ;
-	public function cmd(action:ANIM) {
+	public function cmd(action:ANIM,f:Float=1) {
 		if (view == null) return;
-		if (lastCmd == action) return;
-		lastCmd = action;
-		var anim = cast(view, MovieClip);
+		var anim = cast(view, BitmapAnimation);
+		if (lastCmd != action) {
+			lastCmd = action;
+			
 		
-		switch (action) {
+			switch (action) {
 				case IDLE : 
 					anim.scaleX=1;
 					anim.gotoAndPlay("IDLE");
@@ -89,7 +92,24 @@ class PersoTile extends TileContentModel
 					anim.gotoAndPlay("ROCK");
 					
 					
+			}
 		}
+		
+		var _anim:Dynamic = untyped __js__("anim._animation");
+		if (_anim) {
+			
+			var __anim = {
+					name : _anim.name, 
+					frequency : f, 
+					next : _anim.next, 
+					frames : _anim.frames
+			} 
+			//_anim.frequency = 10;
+			untyped __js__("anim._animation=__anim");
+			
+			trace("anim" +_anim );
+		}
+		
 		
 	}
 	

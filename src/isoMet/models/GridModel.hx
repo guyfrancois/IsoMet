@@ -12,9 +12,13 @@ import js.html.ImageElement;
  */
 
  typedef JsonTile = {
+	var b:String ; // image de fond
     var t : Array<Array<Int>>;// travsersable
     var p : Array<Array<Int>>;//profondeur;
+	 var i : Array<Dynamic>;//items;
 }
+
+
 
 class GridModel 
 {
@@ -88,14 +92,8 @@ class GridModel
 	private function evt_mapLoad(e) {
 		trace("file loaded" + src_map);
 		var item : JsonTile = Main.loadQueue.getResult(src_map);
-		if (item == null) return;
 		
-		for (x in 0...xSize) {
-			for (y in 0...ySize) {
-				items[x][y].setTraversable(item.t[x][y] == 1);
-				items[x][y].setZ(item.p[x][y]);
-			}
-    	}
+		deserialization(item);
 	
 	}
 	
@@ -135,6 +133,47 @@ class GridModel
 	
 	public function update ():Void {
 		
+	}
+	
+	public function deserialization (js:JsonTile) {
+		if (js == null) return;
+		setBackGround(js.b);
+		for (i in js.i) {
+			
+			addTile(new TileContentModel(i), i.x, i.y, 0);
+		}
+		for (x in 0...xSize) {
+			for (y in 0...ySize) {
+				items[x][y].setTraversable(js.t[x][y] == 1);
+				items[x][y].setZ(js.p[x][y]);
+			}
+    	}
+		
+		
+	}
+	
+	public function serialize():String {
+		
+		var t:Array<Array<Int>> = new Array<Array<Int>>();
+		var p:Array<Array<Int>> = new Array<Array<Int>>();
+		var i:Array<Dynamic> = new Array<Dynamic>();
+		
+		
+		for (x in 0...xSize) {
+				t[x] = new Array<Int>();
+				p[x] = new Array<Int>();
+				for (y in 0...ySize) {
+					t[x][y] = getTileAt(x, y).isTraversable()?1:0;
+					p[x][y] = getTileAt(x, y).z;
+					
+					i=i.concat(getTileAt(x, y).serialize());
+					
+				}
+				
+		}
+		var j:JsonTile = {b:src_backGround, p:p, t:t ,i:i};
+		 var js=Json.stringify(j);
+		return js;
 	}
 	
 	

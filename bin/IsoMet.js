@@ -392,122 +392,9 @@ isoMet.Main = function() {
 	this.userPos_y = 20;
 	this.userPos_x = 27;
 	this.g = new isoMet.models.GridModel(50,50);
-	this.g.setBackGround("img/backgrounds/iso-2.jpg",0,0);
 	this.g.setMap("map/map_1.json");
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.spritefromLib("House_White",2);
-	}),25,25,0);
-	this.g.getTileAt(25,25,0).setTraversable(false);
-	this.g.getTileAt(26,25,0).setTraversable(false);
-	this.g.getTileAt(25,26,0).setTraversable(false);
-	this.g.getTileAt(26,26,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("Flag");
-	}),8,19,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),30,30,0);
-	this.g.getTileAt(30,30,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),31,30,0);
-	this.g.getTileAt(31,30,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),32,30,0);
-	this.g.getTileAt(32,30,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),30,31,0);
-	this.g.getTileAt(30,31,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),30,32,0);
-	this.g.getTileAt(30,32,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),32,31,0);
-	this.g.getTileAt(32,31,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),32,32,0);
-	this.g.getTileAt(32,32,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.mur();
-	}),31,32,0);
-	this.g.getTileAt(31,32,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("Flag");
-	}),31,31,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("Flag");
-	}),40,35,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.displayObjectfromLib("Bush");
-	}),23,15,0);
-	this.g.getTileAt(23,15,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.spritefromLib("Store_Medium");
-	}),23,16,0);
-	this.g.getTileAt(23,16,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.displayObjectfromLib("TreeCone");
-	}),23,17,0);
-	this.g.getTileAt(23,17,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.displayObjectfromLib("TreeApple");
-	}),23,18,0);
-	this.g.getTileAt(23,18,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.spritefromLib("House1");
-	}),24,15,0);
-	this.g.getTileAt(24,15,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.spritefromLib("Windmill");
-	}),25,15,0);
-	this.g.getTileAt(25,15,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.displayObjectfromLib("TreeRound");
-	}),26,18,0);
-	this.g.getTileAt(26,18,0).setTraversable(false);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.displayObjectfromLib("TreeRoundFlower");
-	}),27,15,0);
-	this.g.getTileAt(27,15,0).setTraversable(false);
-	this.g.addTile(this.userTile = new isoMet.models.PersoTile(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),this.userPos_x,this.userPos_y,0);
+	this.g.addTile(this.userTile = new isoMet.models.PersoTile("perso_anim"),this.userPos_x,this.userPos_y,0);
 	this.userTile.x = 0;
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),29,19,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),29,18,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),30,17,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),29,16,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),29,15,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),30,14,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),30,13,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),29,13,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),29,12,0);
-	this.g.addTile(new isoMet.models.TileContentModel(function() {
-		return isoMet.view.GfxFactory.autoAnimfromLib("perso_anim");
-	}),30,12,0);
 	this.path = new Array();
 	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CLICK,$bind(this,this.evt_MapClick));
 	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CTRLCLICK,$bind(this,this.evt_MapCtrlClick));
@@ -648,23 +535,7 @@ isoMet.Main.prototype = {
 		}
 	}
 	,serialize: function() {
-		var t = new Array();
-		var p = new Array();
-		var _g1 = 0, _g = this.g.xSize;
-		while(_g1 < _g) {
-			var x = _g1++;
-			t[x] = new Array();
-			p[x] = new Array();
-			var _g3 = 0, _g2 = this.g.ySize;
-			while(_g3 < _g2) {
-				var y = _g3++;
-				t[x][y] = this.g.getTileAt(x,y).isTraversable()?1:0;
-				p[x][y] = this.g.getTileAt(x,y).z;
-			}
-		}
-		var j = { p : p, t : t};
-		var js = haxe.Json.stringify(j);
-		console.log(js);
+		console.log(this.g.serialize());
 	}
 	,updateGridView: function() {
 		if(this.gview == null) this.gview = new createjs.Container();
@@ -690,12 +561,13 @@ isoMet.Main.prototype = {
 		var sd = dx + dy;
 		if(sd == 1 || sd == -1) return 10; else return 14;
 	}
-	,helper_direction_move: function(pj,dx,dy) {
+	,helper_direction_move: function(pj,dx,dy,ddz) {
+		var f = 1 + ddz / 10;
 		if(dx > 0) {
-			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_B); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_G); else this.userTile.cmd(isoMet.models.ANIM.W_BG);
+			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_B,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_G,f); else this.userTile.cmd(isoMet.models.ANIM.W_BG,f);
 		} else if(dx < 0) {
-			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_D); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_H); else this.userTile.cmd(isoMet.models.ANIM.W_HD);
-		} else if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_BD); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_HG); else this.userTile.cmd(isoMet.models.ANIM.IDLE);
+			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_D,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_H,f); else this.userTile.cmd(isoMet.models.ANIM.W_HD,f);
+		} else if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_BD,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_HG,f); else this.userTile.cmd(isoMet.models.ANIM.IDLE);
 	}
 	,move_step: function(x,y) {
 		var _g = this;
@@ -714,10 +586,10 @@ isoMet.Main.prototype = {
 		var sd = dx + dy;
 		this.userPos_x = x;
 		this.userPos_y = y;
-		var speed = alphMoveSpeed * this.helper_direction(dx,dy);
+		var speed = Math.round(alphMoveSpeed * (this.helper_direction(dx,dy) + ddz));
 		console.log("speed" + speed);
 		this.invalideView = true;
-		this.helper_direction_move(this.userTile,dx,dy);
+		this.helper_direction_move(this.userTile,dx,dy,ddz);
 		(this.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : ddx, y : ddy - (zs + ddz)},speed).call(function() {
 			_g.updateDepthNearMove(_g.userTile,from_x,from_y,x,y);
 			view.set({ x : -ddx, y : -ddy - (zf - ddz)});
@@ -861,7 +733,7 @@ isoMet.channel.TileEvent.prototype = $extend(gf.channels.DataBringerEvent.protot
 });
 isoMet.controler = {}
 isoMet.controler.Astar_2 = function(map) {
-	this.MAX_ITERATIONS = 500;
+	this.MAX_ITERATIONS = 2000;
 	this.mapArray = map;
 	this.gridWidth = isoMet.models.GridModel.tilesWidth;
 	this.gridHeight = isoMet.models.GridModel.tilesHeight;
@@ -1007,16 +879,17 @@ isoMet.controler.PathCell.prototype = {
 	,__class__: isoMet.controler.PathCell
 }
 isoMet.models = {}
-isoMet.models.TileContentModel = function(viewBuilder) {
+isoMet.models.TileContentModel = function(json) {
 	this.view = null;
-	if(viewBuilder == null) this.viewBuilder = function() {
-		return isoMet.view.GfxFactory.mur();
-	}; else this.viewBuilder = viewBuilder;
-	this.x = 0;
-	this.y = 0;
-	this.z = 0;
-	this.traversable = true;
-	this.cost = 0;
+	if(json == null) {
+	} else {
+		this.factory = json.factory;
+		this.item = json.item;
+		this.xOffset = json.xOffset;
+		this.yOffset = json.yOffset;
+		this.build(isoMet.view.GfxFactory.builder(this.factory,[this.item]));
+	}
+	this.init();
 };
 isoMet.models.TileContentModel.__name__ = true;
 isoMet.models.TileContentModel.zSort = function(x,y) {
@@ -1053,6 +926,18 @@ isoMet.models.TileContentModel.prototype = {
 		this.y = y;
 		this.z = z;
 	}
+	,init: function() {
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		this.traversable = true;
+		this.cost = 0;
+	}
+	,build: function(viewBuilder) {
+		if(viewBuilder == null) this.viewBuilder = function() {
+			return isoMet.view.GfxFactory.mur();
+		}; else this.viewBuilder = viewBuilder;
+	}
 	,__class__: isoMet.models.TileContentModel
 }
 isoMet.models.GridItems = function(x,y,z) {
@@ -1065,16 +950,30 @@ isoMet.models.GridItems = function(x,y,z) {
 isoMet.models.GridItems.__name__ = true;
 isoMet.models.GridItems.__super__ = isoMet.models.TileContentModel;
 isoMet.models.GridItems.prototype = $extend(isoMet.models.TileContentModel.prototype,{
-	removeTile: function(tile,z) {
+	serialize: function() {
+		var arr = new Array();
+		var _g = 0, _g1 = this.items;
+		while(_g < _g1.length) {
+			var item = _g1[_g];
+			++_g;
+			arr.push({ x : this.x, y : this.y, xOffset : item.xOffset, yOffset : item.yOffset, factory : item.factory, item : item.item});
+		}
+		return arr;
+	}
+	,removeTile: function(tile,z) {
 		this.invalideView = true;
 		var ret = HxOverrides.remove(this.items,tile);
 		return ret;
 	}
+	,tileSort: function(x,y) {
+		return Math.round(y.yOffset - x.yOffset);
+	}
 	,addTile: function(tile,z) {
 		this.invalideView = true;
 		this.items.push(tile);
-		tile.getView().y = tile.y - z * isoMet.models.GridModel.HeightMultiplier;
-		tile.getView().x = tile.x;
+		tile.getView().y = tile.yOffset - z * isoMet.models.GridModel.HeightMultiplier;
+		tile.getView().x = tile.xOffset;
+		this.items.sort($bind(this,this.tileSort));
 	}
 	,setZ: function(z) {
 		this.z = z;
@@ -1082,20 +981,18 @@ isoMet.models.GridItems.prototype = $extend(isoMet.models.TileContentModel.proto
 		while(_g < _g1.length) {
 			var item = _g1[_g];
 			++_g;
-			item.getView().y = item.y - z * isoMet.models.GridModel.HeightMultiplier;
-			item.getView().x = item.x;
+			item.getView().y = -z * isoMet.models.GridModel.HeightMultiplier + item.yOffset;
+			item.getView().x = item.xOffset;
 		}
 		this.updateTraversable();
 		this.invalideView = true;
 	}
 	,updateContainer: function() {
 		var view;
-		if(this.view != null) {
-			view = js.Boot.__cast(this.view , createjs.Container);
-			view.removeAllChildren();
-		} else this.view = view = new createjs.Container();
+		if(this.view != null) view = js.Boot.__cast(this.view , createjs.Container); else this.view = view = new createjs.Container();
 		if(this.sol == null && this.items.length == 0) {
 		} else {
+			view.removeAllChildren();
 			view.x = this.xx;
 			view.y = this.yy;
 			if(this.sol != null) {
@@ -1177,7 +1074,48 @@ isoMet.models.GridModel = function(xSize,ySize) {
 };
 isoMet.models.GridModel.__name__ = true;
 isoMet.models.GridModel.prototype = {
-	update: function() {
+	serialize: function() {
+		var t = new Array();
+		var p = new Array();
+		var i = new Array();
+		var _g1 = 0, _g = this.xSize;
+		while(_g1 < _g) {
+			var x = _g1++;
+			t[x] = new Array();
+			p[x] = new Array();
+			var _g3 = 0, _g2 = this.ySize;
+			while(_g3 < _g2) {
+				var y = _g3++;
+				t[x][y] = this.getTileAt(x,y).isTraversable()?1:0;
+				p[x][y] = this.getTileAt(x,y).z;
+				i = i.concat(this.getTileAt(x,y).serialize());
+			}
+		}
+		var j = { b : this.src_backGround, p : p, t : t, i : i};
+		var js = haxe.Json.stringify(j);
+		return js;
+	}
+	,deserialization: function(js) {
+		if(js == null) return;
+		this.setBackGround(js.b);
+		var _g = 0, _g1 = js.i;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			this.addTile(new isoMet.models.TileContentModel(i),i.x,i.y,0);
+		}
+		var _g1 = 0, _g = this.xSize;
+		while(_g1 < _g) {
+			var x = _g1++;
+			var _g3 = 0, _g2 = this.ySize;
+			while(_g3 < _g2) {
+				var y = _g3++;
+				this.items[x][y].setTraversable(js.t[x][y] == 1);
+				this.items[x][y].setZ(js.p[x][y]);
+			}
+		}
+	}
+	,update: function() {
 	}
 	,getTileAt: function(x,y,z) {
 		return this.items[x][y];
@@ -1196,17 +1134,7 @@ isoMet.models.GridModel.prototype = {
 	,evt_mapLoad: function(e) {
 		console.log("file loaded" + this.src_map);
 		var item = isoMet.Main.loadQueue.getResult(this.src_map);
-		if(item == null) return;
-		var _g1 = 0, _g = this.xSize;
-		while(_g1 < _g) {
-			var x = _g1++;
-			var _g3 = 0, _g2 = this.ySize;
-			while(_g3 < _g2) {
-				var y = _g3++;
-				this.items[x][y].setTraversable(item.t[x][y] == 1);
-				this.items[x][y].setZ(item.p[x][y]);
-			}
-		}
+		this.deserialization(item);
 	}
 	,evt_backLoad: function(e) {
 		console.log("file loaded" + this.src_backGround);
@@ -1282,57 +1210,65 @@ isoMet.models.ANIM.W_H.__enum__ = isoMet.models.ANIM;
 isoMet.models.ANIM.ROCK = ["ROCK",9];
 isoMet.models.ANIM.ROCK.toString = $estr;
 isoMet.models.ANIM.ROCK.__enum__ = isoMet.models.ANIM;
-isoMet.models.PersoTile = function(viewBuilder) {
-	isoMet.models.TileContentModel.call(this,viewBuilder);
+isoMet.models.PersoTile = function(item) {
+	isoMet.models.TileContentModel.call(this,{ x : 0, y : 0, xOffset : 0, yOffset : 0, factory : "animFromLib", item : item});
 	this.lastCmd = isoMet.models.ANIM.IDLE;
 };
 isoMet.models.PersoTile.__name__ = true;
 isoMet.models.PersoTile.__super__ = isoMet.models.TileContentModel;
 isoMet.models.PersoTile.prototype = $extend(isoMet.models.TileContentModel.prototype,{
-	cmd: function(action) {
+	cmd: function(action,f) {
+		if(f == null) f = 1;
 		if(this.view == null) return;
-		if(this.lastCmd == action) return;
-		this.lastCmd = action;
-		var anim = js.Boot.__cast(this.view , createjs.MovieClip);
-		switch( (action)[1] ) {
-		case 0:
-			anim.scaleX = 1;
-			anim.gotoAndPlay("IDLE");
-			break;
-		case 1:
-			anim.scaleX = 1;
-			anim.gotoAndPlay("W_D");
-			break;
-		case 2:
-			anim.scaleX = -1;
-			anim.gotoAndPlay("W_D");
-			break;
-		case 3:
-			anim.scaleX = 1;
-			anim.gotoAndPlay("W_BD");
-			break;
-		case 4:
-			anim.scaleX = -1;
-			anim.gotoAndPlay("W_BD");
-			break;
-		case 5:
-			anim.scaleX = 1;
-			anim.gotoAndPlay("W_TG");
-			break;
-		case 6:
-			anim.scaleX = -1;
-			anim.gotoAndPlay("W_TG");
-			break;
-		case 7:
-			anim.scaleX = 1;
-			anim.gotoAndPlay("W_B");
-			break;
-		case 8:
-			anim.scaleX = 1;
-			anim.gotoAndPlay("W_H");
-			break;
-		default:
-			anim.gotoAndPlay("ROCK");
+		var anim = js.Boot.__cast(this.view , createjs.BitmapAnimation);
+		if(this.lastCmd != action) {
+			this.lastCmd = action;
+			switch( (action)[1] ) {
+			case 0:
+				anim.scaleX = 1;
+				anim.gotoAndPlay("IDLE");
+				break;
+			case 1:
+				anim.scaleX = 1;
+				anim.gotoAndPlay("W_D");
+				break;
+			case 2:
+				anim.scaleX = -1;
+				anim.gotoAndPlay("W_D");
+				break;
+			case 3:
+				anim.scaleX = 1;
+				anim.gotoAndPlay("W_BD");
+				break;
+			case 4:
+				anim.scaleX = -1;
+				anim.gotoAndPlay("W_BD");
+				break;
+			case 5:
+				anim.scaleX = 1;
+				anim.gotoAndPlay("W_TG");
+				break;
+			case 6:
+				anim.scaleX = -1;
+				anim.gotoAndPlay("W_TG");
+				break;
+			case 7:
+				anim.scaleX = 1;
+				anim.gotoAndPlay("W_B");
+				break;
+			case 8:
+				anim.scaleX = 1;
+				anim.gotoAndPlay("W_H");
+				break;
+			default:
+				anim.gotoAndPlay("ROCK");
+			}
+		}
+		var _anim = anim._animation;
+		if(_anim) {
+			var __anim = { name : _anim.name, frequency : f, next : _anim.next, frames : _anim.frames};
+			anim._animation=__anim;
+			console.log("anim" + Std.string(_anim));
 		}
 	}
 	,getView: function() {
@@ -1344,26 +1280,84 @@ isoMet.models.PersoTile.prototype = $extend(isoMet.models.TileContentModel.proto
 isoMet.view = {}
 isoMet.view.GfxFactory = function() { }
 isoMet.view.GfxFactory.__name__ = true;
+isoMet.view.GfxFactory.builder = function(factory,arg) {
+	var f;
+	switch(factory) {
+	case "animFromLib":
+		return (function(f1,a1) {
+			return function() {
+				return f1(a1);
+			};
+		})(isoMet.view.GfxFactory.animFromLib,arg);
+	case "autoAnimfromLib":
+		return (function(f2,a11) {
+			return function() {
+				return f2(a11);
+			};
+		})(isoMet.view.GfxFactory.autoAnimfromLib,arg);
+	case "mur":
+		return function() {
+			return isoMet.view.GfxFactory.mur();
+		};
+	case "spritefromLib":
+		return (function(f3,a12) {
+			return function() {
+				return f3(a12);
+			};
+		})(isoMet.view.GfxFactory.spritefromLib,arg);
+	default:
+		return function() {
+			return isoMet.view.GfxFactory.mur();
+		};
+	}
+}
 isoMet.view.GfxFactory.exemple = function() {
 	return new createjs.Shape();
 }
-isoMet.view.GfxFactory.animFromLib = function(id) {
-	var builder = new createjs.SpriteSheetBuilder();
-	builder.defaultScale = 1;
-	builder.maxWidth = 256;
-	builder.addMovieClip(isoMet.view.GfxFactory.displayObjectfromLib(id));
-	var bmpAnim = new createjs.BitmapAnimation(builder.build());
-	bmpAnim.gotoAndPlay(0);
+isoMet.view.GfxFactory.animFromLib = function(arg) {
+	console.log("Build animFromLib " + Std.string(arg));
+	if(isoMet.view.GfxFactory.bmpAnimDic == null) isoMet.view.GfxFactory.bmpAnimDic = new haxe.ds.StringMap();
+	var id = arg[0];
+	var scale = 1;
+	var bmpAnim;
+	if(isoMet.view.GfxFactory.bmpAnimDic.exists(id)) {
+		var s = isoMet.view.GfxFactory.bmpAnimDic.get(id).spriteSheet.clone();
+		var arAns = null;
+		arAns = s.getAnimations();
+		console.log("arAns " + Std.string(arAns));
+		var arAnsRet = new Array();
+		var _g = 0;
+		while(_g < arAns.length) {
+			var an = arAns[_g];
+			++_g;
+			var anr = { name : an.name, frequency : 1, next : an.next, frames : an.frames};
+			arAnsRet[an.name] = anr;
+			s._data[an.name] = anr;
+		}
+		s._animations = arAnsRet;
+		bmpAnim = new createjs.BitmapAnimation(s);
+	} else {
+		var S = lib[id];
+		if(S == null) return isoMet.view.GfxFactory.mur(255,0,0);
+		var ret = Type.createInstance(S,[]);
+		ret.scaleX = ret.scaleY = scale;
+		ret.mouseEnabled = false;
+		var builder = new createjs.SpriteSheetBuilder();
+		builder.maxWidth = 128;
+		builder.maxHeight = 128;
+		builder.addMovieClip(ret);
+		var spriteSheet = builder.build();
+		bmpAnim = new createjs.BitmapAnimation(spriteSheet);
+		console.log("bounds " + id + ">" + Std.string(bmpAnim.getBounds()));
+		isoMet.view.GfxFactory.bmpAnimDic.set(id,bmpAnim);
+	}
+	bmpAnim.gotoAndPlay("IDLE");
 	return bmpAnim;
 }
-isoMet.view.GfxFactory.animFromLib_complete = function(e,targetDisplay) {
-	var spriteSheet = e.target.spriteSheet;
-	var bmpAnim = new createjs.BitmapAnimation(spriteSheet);
-	targetDisplay.addChild(bmpAnim);
-	bmpAnim.gotoAndPlay(0);
-}
-isoMet.view.GfxFactory.autoAnimfromLib = function(id,scale) {
-	if(scale == null) scale = 1;
+isoMet.view.GfxFactory.autoAnimfromLib = function(arg) {
+	console.log("Build autoAnimfromLib " + Std.string(arg));
+	var id = arg[0];
+	var scale = 1;
 	var S = lib[id];
 	if(S == null) return isoMet.view.GfxFactory.mur(255,0,0);
 	var ret = Type.createInstance(S,[]);
@@ -1371,8 +1365,10 @@ isoMet.view.GfxFactory.autoAnimfromLib = function(id,scale) {
 	ret.mouseEnabled = false;
 	return ret;
 }
-isoMet.view.GfxFactory.displayObjectfromLib = function(id,scale) {
-	if(scale == null) scale = 1;
+isoMet.view.GfxFactory.displayObjectfromLib = function(arg) {
+	console.log("Build displayObjectfromLib " + Std.string(arg));
+	var id = arg[0];
+	var scale = 1;
 	var S = lib[id];
 	if(S == null) return isoMet.view.GfxFactory.mur(255,0,0);
 	var ret = Type.createInstance(S,[]);
@@ -1381,8 +1377,10 @@ isoMet.view.GfxFactory.displayObjectfromLib = function(id,scale) {
 	ret.mouseEnabled = false;
 	return ret;
 }
-isoMet.view.GfxFactory.spritefromLib = function(id,scale) {
-	if(scale == null) scale = 1;
+isoMet.view.GfxFactory.spritefromLib = function(arg) {
+	console.log("Build spritefromLib " + Std.string(arg));
+	var id = arg[0];
+	var scale = 1;
 	var S = spriteLib[id];
 	if(S == null) return isoMet.view.GfxFactory.mur(255,0,0);
 	var ret = Type.createInstance(S,[]);
@@ -1429,6 +1427,7 @@ isoMet.view.GfxFactory.mur = function(r,g,b) {
 	if(b == null) b = 200;
 	if(g == null) g = 200;
 	if(r == null) r = 200;
+	console.log("Build mur " + r + " " + g + " " + b);
 	var w_2 = Math.round(isoMet.models.GridModel.tilesWidth / 2);
 	var h_2 = Math.round(isoMet.models.GridModel.tilesHeight / 2);
 	var h = 18;

@@ -8,6 +8,7 @@ import createjs.easeljs.Shape;
 import createjs.easeljs.SpriteSheet;
 import createjs.easeljs.SpriteSheetBuilder;
 import createjs.easeljs.MovieClip;
+import haxe.ds.StringMap;
 import isoMet.models.GridModel;
 
 /**
@@ -17,73 +18,146 @@ import isoMet.models.GridModel;
 class GfxFactory
 {
 
+	public static function builder(factory:String, arg:Array<Dynamic>):Void  -> DisplayObject {
+		var f : Dynamic;
+		switch (factory) {
+			case  "animFromLib" :
+				return GfxFactory.animFromLib.bind(arg);
+			case "autoAnimfromLib" :
+				return GfxFactory.autoAnimfromLib.bind(arg);
+			case "mur" :
+				return GfxFactory.mur.bind();
+			case "spritefromLib" :
+				return GfxFactory.spritefromLib.bind(arg);
+			default :
+				return GfxFactory.mur.bind();
+				
+		}
+		//return   f.bind(GfxFactory,arg);
+		//var f = Reflect.field(GfxFactory, factory);
+		/*
+		if (f != null) {
+			return   f.bind(GfxFactory,arg);
+		} else {
+			return GfxFactory.mur.bind();
+		}
+		*/
+		
+	}
 	public static function exemple():DisplayObject {
 		return new Shape();
 	}
 	
+	
+	private static var bmpAnimDic:StringMap<BitmapAnimation>;
 	/**
 	 * reste  tester
 	 * @param	id
 	 * @return
 	 */
-	public static function animFromLib(id:String):BitmapAnimation {
+	public static function animFromLib(arg:Array<Dynamic>):DisplayObject {
+		trace("Build animFromLib " + arg);
+		if (bmpAnimDic == null) {
+			bmpAnimDic = new StringMap<BitmapAnimation>();
+		}
+		//var S:Class<Dynamic> = Type.resolveClass("lib." + id); // valable que pour des class registered
+		
+		// TODO : trouver un moyen safe d'acceder au element de library
+		var id = arg[0];
+		var scale = 1;
+		var bmpAnim : BitmapAnimation;
+		
+		if (bmpAnimDic.exists(id)) {
+			//bmpAnim = bmpAnimDic.get(id).clone();
+			var s = bmpAnimDic.get(id).spriteSheet.clone();
+			
+			var arAns:Array<Dynamic>=null;
+			untyped __js__("arAns = s.getAnimations()");
+			trace("arAns " + arAns);
+			var arAnsRet = new Array<Dynamic>();
+			for (an in arAns) {
+				
+				var anr = {
+					name : an.name, 
+					frequency : 1, 
+					next : an.next, 
+					frames : an.frames
+				}
+				arAnsRet[an.name] = anr;
+				untyped __js__("s._data[an.name] = anr");
+			}
+			untyped __js__("s._animations = arAnsRet");
+			
+			bmpAnim = new BitmapAnimation(s);
+			
+		} else {
+		
+		//scale = arg[1]==null?arg[1]:1;
+		var S:Class<MovieClip> = untyped __js__("lib[id]");
+		if (S == null) {
+			return mur(255, 0, 0);
+		}
+		
+		
+		var ret:MovieClip = Type.createInstance(S, []);
+		ret.scaleX = ret.scaleY = scale;
+		ret.mouseEnabled = false;
 		
 		var builder:SpriteSheetBuilder = new SpriteSheetBuilder();
-		builder.defaultScale = 1;
-		builder.maxWidth = 256;
 		
-		builder.addMovieClip(displayObjectfromLib(id));
+		builder.maxWidth = 128;
+		builder.maxHeight = 128;
+		builder.addMovieClip(ret);
+		var spriteSheet = builder.build();
 		
-		
-		
-		var bmpAnim = new BitmapAnimation(builder.build());
-	
-		bmpAnim.gotoAndPlay(0);
-		
-		
-		//var ret:Container = new Container();
-		//builder.addEventListener("complete" , function(e:Dynamic) {
-		//		animFromLib_complete(e, ret);
-		//});
-		//builder.buildAsync();
-		//return ret;
+		bmpAnim = new BitmapAnimation(spriteSheet);
+		trace("bounds "+id+">"+ bmpAnim.getBounds());
+		bmpAnimDic.set(id, bmpAnim);
+		}
+		bmpAnim.gotoAndPlay("IDLE");
 		return bmpAnim;
 		
 	}
 	
-	private static function animFromLib_complete(e:Dynamic, targetDisplay:Container) {
-		
-		var spriteSheet:SpriteSheet = e.target.spriteSheet;
-		
-		var bmpAnim = new BitmapAnimation(spriteSheet);
+
 	
-		targetDisplay.addChild(bmpAnim);
-		
-		bmpAnim.gotoAndPlay(0);
-	}
-	
-	public static function autoAnimfromLib(id:String,scale:Float=1):DisplayObject {
+	public static function autoAnimfromLib(arg:Array<Dynamic>):DisplayObject {
+		trace("Build autoAnimfromLib "+arg);
 		//var S:Class<Dynamic> = Type.resolveClass("lib." + id); // valable que pour des class registered
 		
 		// TODO : trouver un moyen safe d'acceder au element de library
+		var id = arg[0];
+		var scale = 1;
 		
-		var S:Class<DisplayObject> = untyped __js__("lib[id]");
+		//scale = arg[1]==null?arg[1]:1;
+		var S:Class<MovieClip> = untyped __js__("lib[id]");
 		if (S == null) {
 			return mur(255, 0, 0);
 		}
-		var ret:DisplayObject = Type.createInstance(S, []);
+		
+		
+		var ret:MovieClip = Type.createInstance(S, []);
 		ret.scaleX = ret.scaleY = scale;
 		ret.mouseEnabled = false;
+		
+		
 		return ret;
 		
 	}
 	
 	
 	
-	public static function displayObjectfromLib(id:String,scale:Float=1):DisplayObject {
+	
+	
+	public static function displayObjectfromLib(arg:Array<Dynamic>):DisplayObject {
+		trace("Build displayObjectfromLib "+arg);
 		//var S:Class<Dynamic> = Type.resolveClass("lib." + id); // valable que pour des class registered
 		
 		// TODO : trouver un moyen safe d'acceder au element de library
+		var id = arg[0];
+		
+		var scale = 1;
+		//scale = arg[1]==null?arg[1]:1;
 		
 		var S:Class<DisplayObject> = untyped __js__("lib[id]");
 		if (S == null) {
@@ -97,10 +171,14 @@ class GfxFactory
 		
 	}
 	
-	public static function spritefromLib(id:String,scale:Float=1):DisplayObject {
+	public static function spritefromLib(arg:Array<Dynamic>):DisplayObject {
+		trace("Build spritefromLib "+arg);
 		//var S:Class<Dynamic> = Type.resolveClass("lib." + id); // valable que pour des class registered
 		
 		// TODO : trouver un moyen safe d'acceder au element de library
+		var id = arg[0];
+		var scale = 1;
+		//scale = arg[1]==null?arg[1]:1;
 		
 		var S:Class<BitmapAnimation> = untyped __js__("spriteLib[id]");
 		if (S == null) {
@@ -111,7 +189,7 @@ class GfxFactory
 		
 	//	ret.cache( -64, -200, 128, 264, scale);
 		ret.mouseEnabled = false;
-		//ret.shadow=new Shadow("#000000",10,10,1);
+		
 		return ret;
 		
 	}
@@ -194,6 +272,7 @@ class GfxFactory
 	}
 	
 	public static function mur(r:Int = 200, g:Int = 200, b:Int = 200):DisplayObject {
+		trace("Build mur "+r+" "+g+" "+b);
 		var w_2 = Math.round(GridModel.tilesWidth / 2); // 64
 		var h_2 = Math.round(GridModel.tilesHeight / 2); // 32
 		var h = 18;
