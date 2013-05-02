@@ -387,19 +387,8 @@ haxe.Timer.prototype = {
 }
 var isoMet = {}
 isoMet.Main = function() {
-	this.idDebug = 0;
-	this.invalideView = false;
-	this.userPos_y = 20;
-	this.userPos_x = 27;
-	this.g = new isoMet.models.GridModel(50,50);
-	this.g.setMap("map/map_1.json");
-	this.g.addTile(this.userTile = new isoMet.models.PersoTile("perso_anim"),this.userPos_x,this.userPos_y,0);
-	this.userTile.x = 0;
-	this.path = new Array();
-	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CLICK,$bind(this,this.evt_MapClick));
-	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CTRLCLICK,$bind(this,this.evt_MapCtrlClick));
-	isoMet.channel.MapEvent.getChannel().addEventListener("evtEleveplus",$bind(this,this.evt_MapElevePlus));
-	isoMet.channel.MapEvent.getChannel().addEventListener("evtElevemoins",$bind(this,this.evt_MapEleveMoins));
+	this.mapRenderer = new isoMet.view.MapRenderer(isoMet.Main.mainContent);
+	this.mapControler = new isoMet.controler.MapControler(this.mapRenderer);
 };
 isoMet.Main.__name__ = true;
 isoMet.Main.main = function() {
@@ -410,24 +399,19 @@ isoMet.Main.main = function() {
 		e.stopPropagation();
 		return false;
 	};
-	isoMet.Main.container = isoMet.Main.mainContent.parentElement;
+	var container = isoMet.Main.mainContent.parentElement;
 	js.Browser.document.getElementById("loader").className = "";
 	isoMet.Main.loadQueue = new createjs.LoadQueue(false);
 	isoMet.Main.loadQueue.addEventListener("complete",isoMet.Main.evt_fileLoadComplete);
 	isoMet.Main.loadQueue.addEventListener("progress",isoMet.Main.evt_fileLoadProgress);
 	isoMet.Main.loadQueue.addEventListener("error",isoMet.Main.evt_fileLoadError);
 	isoMet.Main.loadQueue.setMaxConnections(5);
-	isoMet.Main._stage = new createjs.Stage(isoMet.Main.mainContent);
-	isoMet.Main.width = isoMet.Main.container.clientWidth;
-	isoMet.Main.height = isoMet.Main.container.clientHeight;
-	isoMet.Main._stage.mouseEnabled = true;
-	isoMet.Main.container.oncontextmenu = isoMet.Main.onContextMenu;
-	console.log("width : " + isoMet.Main.width + "| height : " + isoMet.Main.height);
+	container.oncontextmenu = isoMet.Main.onContextMenu;
 	isoMet.Main._main = new isoMet.Main();
-	isoMet.Main.container.addEventListener("click",($_=isoMet.Main._main,$bind($_,$_.evt_clickMap)));
+	container.addEventListener("click",($_=isoMet.Main._main,$bind($_,$_.evt_clickMap)));
 	js.Browser.document.addEventListener("keydown",($_=isoMet.Main._main,$bind($_,$_.evt_key)));
-	js.Browser.window.addEventListener("resize",isoMet.Main.evt_resize);
-	isoMet.Main.evt_resize(null);
+	js.Browser.window.addEventListener("resize",($_=isoMet.Main._main,$bind($_,$_.evt_resize)));
+	isoMet.Main._main.evt_resize(null);
 	createjs.Ticker.addListener(($_=isoMet.Main._main,$bind($_,$_.tickHandler)));
 }
 isoMet.Main.onContextMenu = function(e) {
@@ -446,247 +430,42 @@ isoMet.Main.evt_fileLoadComplete = function(e) {
 	console.log("evt_fileLoadComplete TOTAL: " + isoMet.Main.loadQueue.progress);
 	js.Browser.document.getElementById("loader").className = "";
 	if(isoMet.Main._main != null) {
-		isoMet.Main._main.updateGridView();
-		haxe.Timer.delay(($_=isoMet.Main._main,$bind($_,$_.updateGridView)),100);
+		isoMet.Main._main.mapRenderer.updateGridView();
+		haxe.Timer.delay(($_=isoMet.Main._main.mapRenderer,$bind($_,$_.updateGridView)),100);
 	}
-}
-isoMet.Main.evt_resize = function(e) {
-	isoMet.Main.width = isoMet.Main.container.clientWidth;
-	isoMet.Main.height = isoMet.Main.container.clientHeight;
-	isoMet.Main.mainContent.setAttribute("width",Std.string(isoMet.Main.width));
-	isoMet.Main.mainContent.setAttribute("height",Std.string(isoMet.Main.height));
-	console.log("width : " + isoMet.Main.width + "| height : " + isoMet.Main.height);
-	isoMet.Main._main.updateGridView();
 }
 isoMet.Main.prototype = {
-	getGridPos: function(v) {
-		var y_x = (2 * v.x - isoMet.Main.width) / isoMet.models.GridModel.tilesWidth;
-		var yx = (2 * v.y - isoMet.Main.height) / isoMet.models.GridModel.tilesHeight + this.g.xSize - 1;
-		console.log("y-x=" + y_x + " y+x=" + yx);
-		var x = (yx - y_x) / 2;
-		var y = (y_x + yx) / 2;
-		console.log("x=" + x + " y=" + y);
-		return new isoMet.models.Int2d(Math.round(x),Math.round(y));
-	}
-	,paintTile: function(x,y) {
-		var items = this.g.getTileAt(x,y,0);
-		var itView = items.getView();
-		var over = false;
-		if(this.pointMouse != null && items.collMouseCoord(this.pointMouse)) {
-			console.log("MouseOver " + items.x + " " + items.y);
-			this.currentMouseTarget = items;
-		}
-		if(itView == null) return;
-		var p = itView.localToGlobal(0,0);
-		this.gview.addChild(itView);
-		this.idDebug++;
-	}
-	,paintXY: function() {
-		this.idDebug = 0;
-		var _g1 = 0, _g = this.g.xSize;
-		while(_g1 < _g) {
-			var x = _g1++;
-			var _g3 = 0, _g2 = this.g.ySize;
-			while(_g3 < _g2) {
-				var y = _g3++;
-				this.paintTile(x,y);
-			}
-		}
-	}
-	,update: function() {
-		var _g1 = 0, _g = this.g.xSize;
-		while(_g1 < _g) {
-			var x = _g1++;
-			var _g3 = 0, _g2 = this.g.ySize;
-			while(_g3 < _g2) {
-				var y = _g3++;
-				var items = this.g.getTileAt(x,y,0);
-				items.setViewCoord((y - x) * (isoMet.models.GridModel.tilesWidth / 2) + isoMet.Main.width / 2,(y + x) * (isoMet.models.GridModel.tilesHeight / 2) + isoMet.models.GridModel.tilesHeight / 2 + (isoMet.Main.height - isoMet.models.GridModel.tilesHeight * this.g.ySize) / 2);
-			}
-		}
-	}
-	,paintCount: function() {
-		if(this.gview == null) return;
-		this.gview.removeAllChildren();
-		if(this.g.backGround != null) this.gview.addChild(this.g.backGround);
-		this.idDebug = 0;
-		var _g1 = 0, _g = this.g.xSize;
-		while(_g1 < _g) {
-			var count = _g1++;
-			var _g2 = 0;
-			while(_g2 < count) {
-				var rCount = _g2++;
-				var x = count - rCount;
-				var y = rCount;
-				this.paintTile(x,y);
-			}
-		}
-		var _g1 = 0, _g = this.g.xSize;
-		while(_g1 < _g) {
-			var count = _g1++;
-			var count2 = this.g.xSize - 1 - count;
-			var _g2 = 0;
-			while(_g2 < count2) {
-				var rCount = _g2++;
-				var x = this.g.xSize - 1 - rCount;
-				var y = this.g.xSize - (count2 - rCount);
-				this.paintTile(x,y);
-			}
-		}
-	}
-	,serialize: function() {
-		console.log(this.g.serialize());
-	}
-	,updateGridView: function() {
-		if(this.gview == null) this.gview = new createjs.Container();
-		if(this.g.backGround != null) {
-			this.g.backGround.x = this.g.xBackOffset + (isoMet.Main.width - this.g.backGround.image.width) / 2;
-			this.g.backGround.y = this.g.yBackOffset + (isoMet.Main.height - this.g.backGround.image.height) / 2;
-			this.gview.addChild(this.g.backGround);
-			var sc = Math.max(isoMet.Main.width / this.g.backGround.image.width,isoMet.Main.height / this.g.backGround.image.height);
-			this.gview.scaleX = this.gview.scaleY = isoMet.Main.width / this.g.backGround.image.width;
-			this.gview.x = -this.g.backGround.x * this.gview.scaleX;
-			this.gview.y = -this.g.backGround.y * this.gview.scaleY;
-		}
-		this.update();
-		this.paintCount();
-		this.invalideView = true;
-		isoMet.Main._stage.addChild(this.gview);
-	}
-	,updateDepthNearMove: function(userTile,f_x,f_y,t_x,t_y) {
-		this.g.removeTile(userTile,f_x,f_y);
-		this.g.addTile(userTile,t_x,t_y);
-	}
-	,helper_direction: function(dx,dy) {
-		var sd = dx + dy;
-		if(sd == 1 || sd == -1) return 10; else return 14;
-	}
-	,helper_direction_move: function(pj,dx,dy,ddz) {
-		var f = 1 + ddz / 10;
-		if(dx > 0) {
-			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_B,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_G,f); else this.userTile.cmd(isoMet.models.ANIM.W_BG,f);
-		} else if(dx < 0) {
-			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_D,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_H,f); else this.userTile.cmd(isoMet.models.ANIM.W_HD,f);
-		} else if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_BD,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_HG,f); else this.userTile.cmd(isoMet.models.ANIM.IDLE);
-	}
-	,move_step: function(x,y) {
-		var _g = this;
-		var alphMoveSpeed = 10;
-		var from_x = this.userPos_x;
-		var from_y = this.userPos_y;
-		var dx = x - this.userPos_x;
-		var dy = y - this.userPos_y;
-		console.log("dx " + dx + " dy " + dy);
-		var view = this.userTile.getView();
-		var ddx = isoMet.models.GridModel.tilesWidth * (dy - dx) / 4;
-		var ddy = isoMet.models.GridModel.tilesHeight * (dy + dx) / 4;
-		var zs = this.g.getTileAt(this.userPos_x,this.userPos_y).z * isoMet.models.GridModel.HeightMultiplier;
-		var zf = this.g.getTileAt(x,y).z * isoMet.models.GridModel.HeightMultiplier;
-		var ddz = (zf - zs) / 2;
-		var sd = dx + dy;
-		this.userPos_x = x;
-		this.userPos_y = y;
-		var speed = Math.round(alphMoveSpeed * (this.helper_direction(dx,dy) + ddz));
-		console.log("speed" + speed);
-		this.invalideView = true;
-		this.helper_direction_move(this.userTile,dx,dy,ddz);
-		(this.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : ddx, y : ddy - (zs + ddz)},speed).call(function() {
-			_g.updateDepthNearMove(_g.userTile,from_x,from_y,x,y);
-			view.set({ x : -ddx, y : -ddy - (zf - ddz)});
-			_g.userPos_x = x;
-			_g.userPos_y = y;
-			console.log("alph complete userTile.dx " + view.x + " userTile.dy " + view.y);
-			_g.invalideView = true;
-			(_g.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : 0, y : -zf},speed).call(function() {
-				console.log("complete userTile.dx " + view.x + " userTile.dy " + view.y);
-				var next = _g.path.pop();
-				if(next != null) {
-					_g.move_step(next.x,next.y);
-					_g.invalideView = true;
-				} else {
-					_g.mvTween = null;
-					_g.invalideView = true;
-					_g.userTile.cmd(isoMet.models.ANIM.IDLE);
-				}
-			});
-		});
-	}
-	,helperMoveTo: function(x,y) {
-		console.log("helperMoveTo" + x + " " + y);
-		if(this.userPos_x == x && this.userPos_y == y) return;
-		var view = this.userTile.getView();
-		if(this.path != null) this.path.splice(0,this.path.length);
-		var oPath = new isoMet.controler.Astar_2(this.g);
-		oPath.setEndPoints(this.userPos_x,this.userPos_y,x,y);
-		this.path = oPath.solve().concat(this.path);
-		if(this.mvTween == null) {
-			var next = this.path.pop();
-			if(next != null) this.move_step(next.x,next.y);
-		}
-	}
-	,evt_MapCtrlClick: function(e) {
-		if(this.currentMouseTarget != null) this.currentMouseTarget.setTraversable(!this.currentMouseTarget.isTraversable());
-		this.invalideView = true;
-	}
-	,evt_MapEleveMoins: function(e) {
-		console.log("evt_MapEleveMoins " + Std.string(e.initialData));
-		if(this.currentMouseTarget != null) this.currentMouseTarget.setZ(this.currentMouseTarget.z - 1);
-		this.invalideView = true;
-	}
-	,evt_MapElevePlus: function(e) {
-		console.log("evt_MapElevePlus " + Std.string(e.initialData));
-		if(this.currentMouseTarget != null) this.currentMouseTarget.setZ(this.currentMouseTarget.z + 1);
-		this.invalideView = true;
-	}
-	,evt_MapClick: function(e) {
-		console.log("evt_MapClick " + Std.string(e.initialData));
-		if(this.currentMouseTarget != null) {
-			if(!this.currentMouseTarget.isTraversable()) return;
-			this.helperMoveTo(this.currentMouseTarget.x,this.currentMouseTarget.y);
-		}
-	}
-	,tickHandler: function() {
-		var newp = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
-		if(this.pointMouse == null || gf.GTools.fdistance_manhattan(newp.x,newp.y,this.pointMouse.x,this.pointMouse.y) > 2) {
-			this.pointMouse = newp;
-			this.invalideView = true;
-		}
-		var fps = js.Browser.document.getElementById("fps");
-		fps.innerHTML = Std.string("FPS :" + (createjs.Ticker.getMeasuredFPS() * 10 | 0) / 10);
-		if(this.mvTween != null || this.invalideView) {
-			if(this.currentMouseTarget != null) this.currentMouseTarget.update();
-			this.currentMouseTarget = null;
-			this.paintCount();
-			if(this.mouseIndic == null) this.mouseIndic = isoMet.view.GfxFactory.circle(255,255,0);
-			if(this.currentMouseTarget != null) this.currentMouseTarget.setSol(this.mouseIndic); else if(this.mouseIndic.parent != null) this.mouseIndic.parent.removeChild(this.mouseIndic);
-			this.invalideView = false;
-		}
-		isoMet.Main._stage.update();
+	serialize: function() {
+		console.log(this.mapRenderer.serialize());
 	}
 	,evt_clickMap: function(e) {
 		var me = js.Boot.__cast(e , MouseEvent);
-		var p = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
-		console.log(isoMet.Main._stage.x + " " + isoMet.Main._stage.y + " " + p.x + " " + p.y + " " + Std.string(me.ctrlKey));
-		if(me.ctrlKey) isoMet.channel.MapEvent.sdispatch(isoMet.channel.MapEvent.EVT_CTRLCLICK,p); else isoMet.channel.MapEvent.sdispatch(isoMet.channel.MapEvent.EVT_CLICK,p);
+		if(me.ctrlKey) isoMet.channel.MapEvent.sdispatch(isoMet.channel.MapEvent.EVT_CTRLCLICK); else isoMet.channel.MapEvent.sdispatch(isoMet.channel.MapEvent.EVT_CLICK);
 	}
 	,evt_key: function(e) {
 		console.log("evt_key" + Std.string(e.keyCode));
 		switch(e.keyCode) {
 		case 32:
-			this.userTile.cmd(isoMet.models.ANIM.ROCK);
+			this.mapRenderer.userTile.cmd(isoMet.models.ANIM.ROCK);
 			isoMet.Main._main.serialize();
 			break;
 		case 107:
-			var p = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
-			isoMet.channel.MapEvent.sdispatch("evtEleveplus",p);
+			isoMet.channel.MapEvent.sdispatch("evtEleveplus");
 			break;
 		case 109:
-			var p = this.gview.globalToLocal(isoMet.Main._stage.mouseX,isoMet.Main._stage.mouseY);
-			isoMet.channel.MapEvent.sdispatch("evtElevemoins",p);
+			isoMet.channel.MapEvent.sdispatch("evtElevemoins");
 			break;
 		default:
 			null;
 		}
+	}
+	,tickHandler: function() {
+		var fps = js.Browser.document.getElementById("fps");
+		fps.innerHTML = Std.string("FPS :" + (createjs.Ticker.getMeasuredFPS() * 10 | 0) / 10);
+		this.mapRenderer.tickHandler(this.mapControler);
+	}
+	,evt_resize: function(e) {
+		this.mapRenderer.evt_resize(e);
 	}
 	,__class__: isoMet.Main
 }
@@ -877,6 +656,44 @@ isoMet.controler.PathCell.prototype = {
 		this.score = this.cout + this.heuristic;
 	}
 	,__class__: isoMet.controler.PathCell
+}
+isoMet.controler.MapControler = function(renderer) {
+	this.renderer = renderer;
+	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CLICK,$bind(this,this.evt_MapClick));
+	isoMet.channel.MapEvent.getChannel().addEventListener(isoMet.channel.MapEvent.EVT_CTRLCLICK,$bind(this,this.evt_MapCtrlClick));
+	isoMet.channel.MapEvent.getChannel().addEventListener("evtEleveplus",$bind(this,this.evt_MapElevePlus));
+	isoMet.channel.MapEvent.getChannel().addEventListener("evtElevemoins",$bind(this,this.evt_MapEleveMoins));
+};
+isoMet.controler.MapControler.__name__ = true;
+isoMet.controler.MapControler.prototype = {
+	evt_MapCtrlClick: function(e) {
+		if(this.currentMouseTarget != null) this.currentMouseTarget.setTraversable(!this.currentMouseTarget.isTraversable());
+		this.renderer.invalidate();
+	}
+	,evt_MapEleveMoins: function(e) {
+		console.log("evt_MapEleveMoins " + Std.string(e.initialData));
+		if(this.currentMouseTarget != null) this.currentMouseTarget.setZ(this.currentMouseTarget.z - 1);
+		this.renderer.invalidate();
+	}
+	,evt_MapElevePlus: function(e) {
+		console.log("evt_MapElevePlus " + Std.string(e.initialData));
+		if(this.currentMouseTarget != null) this.currentMouseTarget.setZ(this.currentMouseTarget.z + 1);
+		this.renderer.invalidate();
+	}
+	,evt_MapClick: function(e) {
+		console.log("evt_MapClick " + Std.string(e.initialData));
+		if(this.currentMouseTarget != null) {
+			if(!this.currentMouseTarget.isTraversable()) return;
+			this.renderer.helperMoveTo(this.currentMouseTarget.x,this.currentMouseTarget.y);
+		}
+	}
+	,getMouseTarget: function() {
+		return this.currentMouseTarget;
+	}
+	,updateMouseTarget: function(currentMouseTarget) {
+		this.currentMouseTarget = currentMouseTarget;
+	}
+	,__class__: isoMet.controler.MapControler
 }
 isoMet.models = {}
 isoMet.models.TileContentModel = function(json) {
@@ -1444,6 +1261,220 @@ isoMet.view.GfxFactory.mur = function(r,g,b) {
 	gfx.graphics.moveTo(-w_2,-h_2ph).lineTo(-w_2,0).lineTo(0,h_2).lineTo(0,-h).lineTo(-w_2,-h_2ph);
 	gfx.graphics.closePath();
 	return gfx;
+}
+isoMet.view.MapRenderer = function(mainContent) {
+	this.idDebug = 0;
+	this.invalideView = false;
+	this.userPos_y = 20;
+	this.userPos_x = 27;
+	this.mainContent = mainContent;
+	this._stage = new createjs.Stage(mainContent);
+	this.container = mainContent.parentElement;
+	this._stage.mouseEnabled = true;
+	this.width = this.container.clientWidth;
+	this.height = this.container.clientHeight;
+	this.g = new isoMet.models.GridModel(50,50);
+	this.g.setMap("map/map_1.json");
+	this.g.addTile(this.userTile = new isoMet.models.PersoTile("perso_anim"),this.userPos_x,this.userPos_y,0);
+	this.userTile.x = 0;
+	this.path = new Array();
+};
+isoMet.view.MapRenderer.__name__ = true;
+isoMet.view.MapRenderer.prototype = {
+	serialize: function() {
+		return this.g.serialize();
+	}
+	,getGridPos: function(v) {
+		var y_x = (2 * v.x - this.width) / isoMet.models.GridModel.tilesWidth;
+		var yx = (2 * v.y - this.height) / isoMet.models.GridModel.tilesHeight + this.g.xSize - 1;
+		console.log("y-x=" + y_x + " y+x=" + yx);
+		var x = (yx - y_x) / 2;
+		var y = (y_x + yx) / 2;
+		console.log("x=" + x + " y=" + y);
+		return new isoMet.models.Int2d(Math.round(x),Math.round(y));
+	}
+	,updateDepthNearMove: function(userTile,f_x,f_y,t_x,t_y) {
+		this.g.removeTile(userTile,f_x,f_y);
+		this.g.addTile(userTile,t_x,t_y);
+	}
+	,helper_direction: function(dx,dy) {
+		var sd = dx + dy;
+		if(sd == 1 || sd == -1) return 10; else return 14;
+	}
+	,helper_direction_move: function(pj,dx,dy,ddz) {
+		var f = 1 + ddz / 10;
+		if(dx > 0) {
+			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_B,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_G,f); else this.userTile.cmd(isoMet.models.ANIM.W_BG,f);
+		} else if(dx < 0) {
+			if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_D,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_H,f); else this.userTile.cmd(isoMet.models.ANIM.W_HD,f);
+		} else if(dy > 0) this.userTile.cmd(isoMet.models.ANIM.W_BD,f); else if(dy < 0) this.userTile.cmd(isoMet.models.ANIM.W_HG,f); else this.userTile.cmd(isoMet.models.ANIM.IDLE);
+	}
+	,move_step: function(x,y) {
+		var _g = this;
+		var alphMoveSpeed = 10;
+		var from_x = this.userPos_x;
+		var from_y = this.userPos_y;
+		var dx = x - this.userPos_x;
+		var dy = y - this.userPos_y;
+		console.log("dx " + dx + " dy " + dy);
+		var view = this.userTile.getView();
+		var ddx = isoMet.models.GridModel.tilesWidth * (dy - dx) / 4;
+		var ddy = isoMet.models.GridModel.tilesHeight * (dy + dx) / 4;
+		var zs = this.g.getTileAt(this.userPos_x,this.userPos_y).z * isoMet.models.GridModel.HeightMultiplier;
+		var zf = this.g.getTileAt(x,y).z * isoMet.models.GridModel.HeightMultiplier;
+		var ddz = (zf - zs) / 2;
+		var sd = dx + dy;
+		this.userPos_x = x;
+		this.userPos_y = y;
+		var speed = Math.round(alphMoveSpeed * (this.helper_direction(dx,dy) + ddz));
+		console.log("speed" + speed);
+		this.invalideView = true;
+		this.helper_direction_move(this.userTile,dx,dy,ddz);
+		(this.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : ddx, y : ddy - (zs + ddz)},speed).call(function() {
+			_g.updateDepthNearMove(_g.userTile,from_x,from_y,x,y);
+			view.set({ x : -ddx, y : -ddy - (zf - ddz)});
+			_g.userPos_x = x;
+			_g.userPos_y = y;
+			console.log("alph complete userTile.dx " + view.x + " userTile.dy " + view.y);
+			_g.invalideView = true;
+			(_g.mvTween = createjs.Tween.get(view,null,null,true)).to({ x : 0, y : -zf},speed).call(function() {
+				console.log("complete userTile.dx " + view.x + " userTile.dy " + view.y);
+				var next = _g.path.pop();
+				if(next != null) {
+					_g.move_step(next.x,next.y);
+					_g.invalideView = true;
+				} else {
+					_g.mvTween = null;
+					_g.invalideView = true;
+					_g.userTile.cmd(isoMet.models.ANIM.IDLE);
+				}
+			});
+		});
+	}
+	,helperMoveTo: function(x,y) {
+		console.log("helperMoveTo" + x + " " + y);
+		if(this.userPos_x == x && this.userPos_y == y) return;
+		var view = this.userTile.getView();
+		if(this.path != null) this.path.splice(0,this.path.length);
+		var oPath = new isoMet.controler.Astar_2(this.g);
+		oPath.setEndPoints(this.userPos_x,this.userPos_y,x,y);
+		this.path = oPath.solve().concat(this.path);
+		if(this.mvTween == null) {
+			var next = this.path.pop();
+			if(next != null) this.move_step(next.x,next.y);
+		}
+	}
+	,paintTile: function(x,y) {
+		var items = this.g.getTileAt(x,y,0);
+		var itView = items.getView();
+		var over = false;
+		if(this.pointMouse != null && items.collMouseCoord(this.pointMouse)) {
+			console.log("MouseOver " + items.x + " " + items.y);
+			this.currentMouseTarget = items;
+		}
+		if(itView == null) return;
+		var p = itView.localToGlobal(0,0);
+		this.gview.addChild(itView);
+		this.idDebug++;
+	}
+	,paintXY: function() {
+		this.idDebug = 0;
+		var _g1 = 0, _g = this.g.xSize;
+		while(_g1 < _g) {
+			var x = _g1++;
+			var _g3 = 0, _g2 = this.g.ySize;
+			while(_g3 < _g2) {
+				var y = _g3++;
+				this.paintTile(x,y);
+			}
+		}
+	}
+	,update: function() {
+		var _g1 = 0, _g = this.g.xSize;
+		while(_g1 < _g) {
+			var x = _g1++;
+			var _g3 = 0, _g2 = this.g.ySize;
+			while(_g3 < _g2) {
+				var y = _g3++;
+				var items = this.g.getTileAt(x,y,0);
+				items.setViewCoord((y - x) * (isoMet.models.GridModel.tilesWidth / 2) + this.width / 2,(y + x) * (isoMet.models.GridModel.tilesHeight / 2) + isoMet.models.GridModel.tilesHeight / 2 + (this.height - isoMet.models.GridModel.tilesHeight * this.g.ySize) / 2);
+			}
+		}
+	}
+	,paintCount: function() {
+		if(this.gview == null) return;
+		this.gview.removeAllChildren();
+		if(this.g.backGround != null) this.gview.addChild(this.g.backGround);
+		this.idDebug = 0;
+		var _g1 = 0, _g = this.g.xSize;
+		while(_g1 < _g) {
+			var count = _g1++;
+			var _g2 = 0;
+			while(_g2 < count) {
+				var rCount = _g2++;
+				var x = count - rCount;
+				var y = rCount;
+				this.paintTile(x,y);
+			}
+		}
+		var _g1 = 0, _g = this.g.xSize;
+		while(_g1 < _g) {
+			var count = _g1++;
+			var count2 = this.g.xSize - 1 - count;
+			var _g2 = 0;
+			while(_g2 < count2) {
+				var rCount = _g2++;
+				var x = this.g.xSize - 1 - rCount;
+				var y = this.g.xSize - (count2 - rCount);
+				this.paintTile(x,y);
+			}
+		}
+	}
+	,updateGridView: function() {
+		if(this.gview == null) this.gview = new createjs.Container();
+		if(this.g.backGround != null) {
+			this.g.backGround.x = this.g.xBackOffset + (this.width - this.g.backGround.image.width) / 2;
+			this.g.backGround.y = this.g.yBackOffset + (this.height - this.g.backGround.image.height) / 2;
+			this.gview.addChild(this.g.backGround);
+			var sc = Math.max(this.width / this.g.backGround.image.width,this.height / this.g.backGround.image.height);
+			this.gview.scaleX = this.gview.scaleY = this.width / this.g.backGround.image.width;
+			this.gview.x = -this.g.backGround.x * this.gview.scaleX;
+			this.gview.y = -this.g.backGround.y * this.gview.scaleY;
+		}
+		this.update();
+		this.paintCount();
+		this.invalideView = true;
+		this._stage.addChild(this.gview);
+	}
+	,evt_resize: function(e) {
+		this.width = this.container.clientWidth;
+		this.height = this.container.clientHeight;
+		this.mainContent.setAttribute("width",Std.string(this.width));
+		this.mainContent.setAttribute("height",Std.string(this.height));
+		console.log("width : " + this.width + "| height : " + this.height);
+		this.updateGridView();
+	}
+	,tickHandler: function(mapControler) {
+		this.currentMouseTarget = null;
+		var newp = this.gview.globalToLocal(this._stage.mouseX,this._stage.mouseY);
+		if(this.pointMouse == null || gf.GTools.fdistance_manhattan(newp.x,newp.y,this.pointMouse.x,this.pointMouse.y) > 2) {
+			this.pointMouse = newp;
+			this.invalideView = true;
+		}
+		if(this.mvTween != null || this.invalideView) {
+			if(mapControler.getMouseTarget() != null) mapControler.getMouseTarget().update();
+			this.paintCount();
+			if(this.mouseIndic == null) this.mouseIndic = isoMet.view.GfxFactory.circle(255,255,0);
+			mapControler.updateMouseTarget(this.currentMouseTarget);
+			if(this.currentMouseTarget != null) mapControler.getMouseTarget().setSol(this.mouseIndic); else if(this.mouseIndic.parent != null) this.mouseIndic.parent.removeChild(this.mouseIndic);
+			this.invalideView = false;
+		}
+		this._stage.update();
+	}
+	,invalidate: function() {
+		this.invalideView = true;
+	}
+	,__class__: isoMet.view.MapRenderer
 }
 var js = {}
 js.Boot = function() { }

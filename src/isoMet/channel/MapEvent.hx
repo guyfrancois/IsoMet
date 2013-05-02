@@ -20,7 +20,7 @@ class MapEvent extends DataBringerEvent<Point>
 	
 	
 	
-	static public function sdispatch(type:String, initialData:Point):MapEvent	{
+	static public function sdispatch(type:String, initialData:Point=null):MapEvent	{
 			var notif:MapEvent = new MapEvent(type, initialData);
 			notif.dispatch();
 			return notif;
