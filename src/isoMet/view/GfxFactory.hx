@@ -105,8 +105,8 @@ class GfxFactory
 		
 		var builder:SpriteSheetBuilder = new SpriteSheetBuilder();
 		
-		builder.maxWidth = 128;
-		builder.maxHeight = 128;
+		builder.maxWidth = 256;
+		builder.maxHeight = 256;
 		builder.addMovieClip(ret);
 		var spriteSheet = builder.build();
 		

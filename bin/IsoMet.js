@@ -1160,8 +1160,8 @@ isoMet.view.GfxFactory.animFromLib = function(arg) {
 		ret.scaleX = ret.scaleY = scale;
 		ret.mouseEnabled = false;
 		var builder = new createjs.SpriteSheetBuilder();
-		builder.maxWidth = 128;
-		builder.maxHeight = 128;
+		builder.maxWidth = 256;
+		builder.maxHeight = 256;
 		builder.addMovieClip(ret);
 		var spriteSheet = builder.build();
 		bmpAnim = new createjs.BitmapAnimation(spriteSheet);
